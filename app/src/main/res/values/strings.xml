@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Goal Getter</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Dashboard</string>
+    <string name="title_section2">Add Goal</string>
+    <string name="title_section3">Focus Timer</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,4 +11,25 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--Dashboard Strings-->
+    <string name="todo_label">TODO Today:</string>
+    <string name="current_label">Current Goals:</string>
+    <string name="past_label">Past Goals</string>
+
+    <!--Detail Strings -->
+    <string name="milestones">Milestones</string>
+    <string name="add_milestone">Add Milestone</string>
+    <string name="percent_sign">\u0025</string>
+
+    <!--Focus Timer Strings -->
+    <string name="time_for">Time For</string>
+    <string name="minutes">Minutes</string>
+    <string name="restart">Restart</string>
+    <string name="stop">Stop</string>
+    <string name="you_lasted">You Lasted:</string>
+    <string name="set_alarm">Set Alarm</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
