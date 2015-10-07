@@ -22,6 +22,8 @@
     <string name="add_milestone">Add Milestone</string>
     <string name="percent_sign">\u0025</string>
     <string name="by">by </string>
+    <string name="how">To do this I will:</string>
+    <string name="a_week"> days a week</string>
 
     <!--Focus Timer Strings -->
     <string name="time_for">Time For</string>

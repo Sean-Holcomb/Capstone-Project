@@ -25,15 +25,19 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/restart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/restart"
-        android:id="@+id/restart"/>
+        android:background="@color/green"
+        />
     <Button
+        android:id="@+id/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stop"
-        android:id="@+id/stop"/>
+        android:background="@color/red"
+        />
 
     <TextView
         android:layout_width="wrap_content"
