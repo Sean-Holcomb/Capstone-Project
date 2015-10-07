@@ -21,6 +21,7 @@
     <string name="milestones">Milestones</string>
     <string name="add_milestone">Add Milestone</string>
     <string name="percent_sign">\u0025</string>
+    <string name="by">by </string>
 
     <!--Focus Timer Strings -->
     <string name="time_for">Time For</string>
@@ -29,6 +30,8 @@
     <string name="stop">Stop</string>
     <string name="you_lasted">You Lasted:</string>
     <string name="set_alarm">Set Alarm</string>
+    <string name="zero">0</string>
+    <string name="zero_timer">0:00:00</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -10,26 +10,31 @@
 
     <TextView
         android:id="@+id/todo_label"
+        android:text="@string/todo_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hey"/>
+        />
     <ListView
         android:id="@+id/todo_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/current_label"
+        android:text="@string/current_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <View
+    <ListView
+        android:id="@+id/current_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/past_label"
+        android:text="@string/past_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <View
+    <ListView
+        android:id="@+id/past_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
