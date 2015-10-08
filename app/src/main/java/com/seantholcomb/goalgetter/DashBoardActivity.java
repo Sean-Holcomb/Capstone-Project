@@ -1,25 +1,20 @@
 package com.seantholcomb.goalgetter;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 
-public class DashBoardActivity extends ActionBarActivity
+public class DashBoardActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
@@ -31,6 +26,8 @@ public class DashBoardActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private int menuLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +37,7 @@ public class DashBoardActivity extends ActionBarActivity
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
+        menuLayout=R.menu.dash_board;
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -60,12 +57,15 @@ public class DashBoardActivity extends ActionBarActivity
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
+                menuLayout = R.menu.dash_board;
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
+                menuLayout = R.menu.detail;
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                menuLayout = R.menu.focus_timer;
                 break;
         }
     }
@@ -84,7 +84,7 @@ public class DashBoardActivity extends ActionBarActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.dash_board, menu);
+            getMenuInflater().inflate(menuLayout, menu);
             restoreActionBar();
             return true;
         }
@@ -115,6 +115,7 @@ public class DashBoardActivity extends ActionBarActivity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private int mLayout;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -134,7 +135,18 @@ public class DashBoardActivity extends ActionBarActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
+            switch (this.getArguments().getInt(ARG_SECTION_NUMBER)){
+                case 2:
+                    mLayout=R.layout.fragment_detail;
+                    break;
+                case 3:
+                    mLayout=R.layout.fragment_focus_timer;
+                    break;
+                default:
+                    mLayout=R.layout.fragment_dash_board;
+
+            }
+            View rootView = inflater.inflate(mLayout, container, false);
             return rootView;
         }
 

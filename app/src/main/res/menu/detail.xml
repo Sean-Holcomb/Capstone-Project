@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_edit"
+        android:orderInCategory="1"
+        android:title="@string/edit"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about_detail"
+        android:orderInCategory="2"
+        android:title="@string/about_detial"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>
