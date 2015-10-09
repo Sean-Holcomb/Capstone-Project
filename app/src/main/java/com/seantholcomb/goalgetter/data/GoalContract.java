@@ -28,9 +28,6 @@ public class GoalContract {
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
 
-    //////////////////////////////////////////////////
-    public static final String PATH_WEATHER = "weather";
-    public static final String PATH_LOCATION = "location";
     public static final String PATH_GOAL= "goal";
 
     // To make it easy to query for the exact date, we normalize all dates that go into
