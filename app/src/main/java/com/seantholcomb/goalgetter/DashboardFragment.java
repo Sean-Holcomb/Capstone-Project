@@ -2,6 +2,7 @@ package com.seantholcomb.goalgetter;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,13 @@ import android.view.ViewGroup;
 import com.seantholcomb.goalgetter.data.GoalContract;
 
 
-public class DetailFragment extends Fragment {
+public class DashboardFragment extends Fragment {
+
+
+    //private GoalAdapter mGoalAdaptor;
+    private RecyclerView mCurrentList;
+    private RecyclerView mPastList;
+    private RecyclerView mTodoList;
 
     private static final String[] Goal_COLUMNS = {
 
@@ -40,22 +47,35 @@ public class DetailFragment extends Fragment {
     static final int COL_MISSED_TASKS = 10;
     static final int COL_STATUS = 11;
 
-    public DetailFragment() {
+
+    public DashboardFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
+        RecyclerView currentList = (RecyclerView) rootView.findViewById(R.id.current_list);
+        //currentList.setLayoutManager(new LinearLayoutManager(getActivity()));
+/*
+        mGoalAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
+            @Override
+            public void onClick(Long date, GoalAdapter.GoalAdapterViewHolder vh) {
+                ((Callback) getActivity())
+                        .onItemSelected(GoalContract.GoalEntry.buildGoalUri(),
+                                vh
+                        );
+            }
+        });
+        currentList.setAdapter(mGoalAdapter);
+        */
+        return rootView;
     }
-
 
 }

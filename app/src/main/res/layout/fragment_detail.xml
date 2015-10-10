@@ -39,12 +39,12 @@
         android:layout_height="wrap_content"
         android:text="@string/add_milestone" />
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/milestone_graph"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/milestone_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

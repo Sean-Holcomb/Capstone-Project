@@ -2,45 +2,55 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/graph_padding"
     android:paddingBottom="@dimen/graph_padding"
-    >
-    <View
-        android:id="@+id/green_bar"
-        android:background="@color/green"
+    android:paddingTop="@dimen/graph_padding">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"/>
-    <View
-        android:id="@+id/red_bar"
-        android:background="@color/red"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_height="match_parent">
+
+        <View
+            android:id="@+id/green_bar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@color/green" />
+
+        <View
+            android:id="@+id/clear_bar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+        <View
+            android:id="@+id/red_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/red" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/title"
-        android:text="test"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="test" />
+
     <TextView
         android:id="@+id/percent"
-        android:text="100%"
-        android:layout_gravity="center_vertical"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="center_vertical"
+        android:text="100%" />
+
     <TextView
         android:id="@+id/minus_precent"
-        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:text="-100%"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_gravity="center_vertical"
+        android:text="-100%" />
 
 
 </RelativeLayout>
