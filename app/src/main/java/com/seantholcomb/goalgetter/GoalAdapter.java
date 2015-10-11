@@ -1,4 +1,3 @@
-/*
 package com.seantholcomb.goalgetter;
 
 import android.content.Context;
@@ -13,30 +12,23 @@ import android.widget.TextView;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
 
-*/
 /**
  * Created by seanholcomb on 10/9/15.
- *//*
-
-public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterViewHolder> {
+ */
+public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterViewHolder> {
 
     private static final int VIEW_TYPE_COMPLETE = 0;
     private static final int VIEW_TYPE_CURRENT = 1;
 
-    // Flag to determine if we want to use a separate view for "today".
-    private boolean mUseTodayLayout = true;
 
     private Cursor mCursor;
     final private Context mContext;
     final private GoalAdapterOnClickHandler mClickHandler;
-    final private View mEmptyView;
     //final private ItemChoiceManager mICM;
 
-    */
-/**
+    /**
      * Cache of the children views for a forecast list item.
-     *//*
-
+     */
     public class GoalAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mRedBar;
         public final View mClearBar;
@@ -78,16 +70,14 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterVie
         //mICM.setChoiceMode(choiceMode);
     }
 
-    */
-/*
+    /*
         This takes advantage of the fact that the viewGroup passed to onCreateViewHolder is the
         RecyclerView that will be used to contain the view, so that it can get the current
         ItemSelectionManager from the view.
 
         One could implement this pattern without modifying RecyclerView by taking advantage
         of the view tag to store the ItemChoiceManager.
-     *//*
-
+     */
     @Override
     public GoalAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if ( viewGroup instanceof RecyclerView ) {
@@ -103,11 +93,10 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterVie
     @Override
     public void onBindViewHolder(GoalAdapterViewHolder goalAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
-        int total_tasks = mCursor.getInt(DashboardFragment.COLUMN_TOTAL_TASKS);
-        int tasks_done;
-        int tasks_missed;
-        int future_tasks;
-        String title;
+        int total_tasks = mCursor.getInt(DashboardFragment.COL_TOTAL_TASKS);
+        int tasks_done = mCursor.getInt(DashboardFragment.COL_DONE_TASK);
+        int tasks_missed = mCursor.getInt(DashboardFragment.COL_MISSED_TASKS);
+        String title = mCursor.getString(DashboardFragment.COL_NAME);
         goalAdapterViewHolder.mTitleView.setText(title);
         int[] percents =Utility.getPercents(total_tasks,tasks_done,tasks_missed);
         goalAdapterViewHolder.mPercentView.setText(percents[0]+"%");
@@ -120,10 +109,10 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterVie
         //mICM.onBindViewHolder(GoalAdapterViewHolder, position);
     }
     public void setBarWeight(View view, int weight){
-        LinearLayout.LayoutParams loparams = (LinearLayout.LayoutParams) view.getLayoutParams();
+        LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) view.getLayoutParams();
 
-        loparams.weight = weight;
-        view.setLayoutParams(loparams);
+        linearParams.weight = weight;
+        view.setLayoutParams(linearParams);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -154,7 +143,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterVie
     public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
-        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        //mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public Cursor getCursor() {
@@ -167,4 +156,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoaladapterVie
             vfh.onClick(vfh.itemView);
         }
     }
-}*/
+
+
+}
