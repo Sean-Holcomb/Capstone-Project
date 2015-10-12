@@ -1,5 +1,6 @@
 package com.seantholcomb.goalgetter;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,7 +12,8 @@ import android.view.MenuItem;
 
 
 public class DashBoardActivity extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        DashboardFragment.Callback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -58,6 +60,12 @@ public class DashBoardActivity extends AppCompatActivity
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onItemSelected(Uri uri, GoalAdapter.GoalAdapterViewHolder vh){
+
+
     }
 
     public void onSectionAttached(int number) {

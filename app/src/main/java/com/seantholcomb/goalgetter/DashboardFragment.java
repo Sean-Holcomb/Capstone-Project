@@ -20,6 +20,8 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
 
     private GoalAdapter mGoalAdapter;
+    private TodoAdapter mTodoAdapter;
+    private GoalAdapter mPastAdapter;
     private RecyclerView mCurrentList;
     private RecyclerView mPastList;
     private RecyclerView mTodoList;
@@ -54,8 +56,10 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_STATUS = 11;
 
     public interface Callback {
-        public void onItemSelected(Uri dateUri, GoalAdapter.GoalAdapterViewHolder vh);
+        public void onItemSelected(Uri GoalUri, GoalAdapter.GoalAdapterViewHolder vh);
     }
+
+
     public DashboardFragment() {
         // Required empty public constructor
     }
@@ -70,7 +74,11 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         RecyclerView currentList = (RecyclerView) rootView.findViewById(R.id.current_list);
+        RecyclerView todoList = (RecyclerView) rootView.findViewById(R.id.todo_list);
+        RecyclerView pastList = (RecyclerView) rootView.findViewById(R.id.past_list);
         currentList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        pastList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        todoList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mGoalAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
             @Override
@@ -81,8 +89,26 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
                         );
             }
         });
-        currentList.setAdapter(mGoalAdapter);
 
+        mPastAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
+            @Override
+            public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
+                ((Callback) getActivity())
+                        .onItemSelected(GoalContract.GoalEntry.CONTENT_URI,
+                                vh
+                        );
+            }
+        });
+
+        mTodoAdapter = new TodoAdapter(getActivity(), new TodoAdapter.TodoAdapterOnClickHandler() {
+            @Override
+            public void onClick(String id, TodoAdapter.TodoAdapterViewHolder vh) {
+
+            }
+        });
+        currentList.setAdapter(mGoalAdapter);
+        pastList.setAdapter(mPastAdapter);
+        todoList.setAdapter(mTodoAdapter);
         return rootView;
     }
 
@@ -116,6 +142,8 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         super.onDestroy();
         if (null != mCurrentList) {
             mCurrentList.clearOnScrollListeners();
+            mPastList.clearOnScrollListeners();
+            mTodoList.clearOnScrollListeners();
         }
     }
 

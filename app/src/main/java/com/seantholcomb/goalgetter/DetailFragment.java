@@ -1,7 +1,14 @@
 package com.seantholcomb.goalgetter;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +16,7 @@ import android.view.ViewGroup;
 import com.seantholcomb.goalgetter.data.GoalContract;
 
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String[] Goal_COLUMNS = {
 
@@ -40,6 +47,10 @@ public class DetailFragment extends Fragment {
     static final int COL_MISSED_TASKS = 10;
     static final int COL_STATUS = 11;
 
+    private GoalAdapter mGoalAdapter;
+    private RecyclerView mMilestoneGraph;
+    private RecyclerView mMilestoneList;
+
     public DetailFragment() {
         // Required empty public constructor
     }
@@ -53,9 +64,53 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        mMilestoneGraph = (RecyclerView) rootView.findViewById(R.id.milestone_graph);
+        mMilestoneGraph.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mMilestoneList = (RecyclerView) rootView.findViewById(R.id.milestone_list);
+        mMilestoneList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        return rootView;
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
+
+
+        Uri goalUri = GoalContract.GoalEntry.CONTENT_URI;
+
+        return new CursorLoader(getActivity(),
+                goalUri,
+                Goal_COLUMNS,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mGoalAdapter.swapCursor(data);
+
+
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (null != mMilestoneList) {
+            mMilestoneList.clearOnScrollListeners();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mGoalAdapter.swapCursor(null);
+    }
+
 
 
 }
