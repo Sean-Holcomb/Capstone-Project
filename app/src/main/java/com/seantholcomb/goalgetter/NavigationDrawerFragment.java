@@ -274,4 +274,10 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(int position);
     }
+
+    public void openDrawer(){
+        if(!isDrawerOpen()){
+            mDrawerLayout.openDrawer(mFragmentContainerView);
+        }
+    }
 }

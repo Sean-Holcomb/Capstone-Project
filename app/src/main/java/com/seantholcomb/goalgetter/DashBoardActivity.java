@@ -2,6 +2,7 @@ package com.seantholcomb.goalgetter;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -25,6 +26,7 @@ public class DashBoardActivity extends AppCompatActivity
      */
     private CharSequence mTitle;
     private int menuLayout;
+    private Fragment mfragment;
 
 
     @Override
@@ -49,14 +51,22 @@ public class DashBoardActivity extends AppCompatActivity
         Fragment fragment;
         switch (position){
             case 1:
+                mTitle = getString(R.string.title_section2);
+                menuLayout = R.menu.detail;
                 fragment = new DetailFragment();
                 break;
             case 2:
                 fragment  = new FocusTimerFragment();
+                mTitle = getString(R.string.title_section3);
+                menuLayout = R.menu.focus_timer;
+
                 break;
             default:
+                mTitle = getString(R.string.title_section1);
+                menuLayout = R.menu.dash_board;
                 fragment= new DashboardFragment();
         }
+        mfragment=fragment;
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
@@ -68,28 +78,13 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                menuLayout = R.menu.dash_board;
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                menuLayout = R.menu.detail;
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                menuLayout = R.menu.focus_timer;
-                break;
-        }
-    }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+
     }
 
 
@@ -113,6 +108,24 @@ public class DashBoardActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (menuLayout == R.menu.focus_timer){
+            if (id == R.id.action_about){
+                DialogFragment newFragment = new DialogFragment();
+                newFragment.show(getSupportFragmentManager(), "aboutFocus");
+            }
+        }
+
+        if (menuLayout == R.menu.detail){
+            if (id == R.id.action_about_detail){
+                DialogFragment newFragment = new DialogFragment();
+                newFragment.show(getSupportFragmentManager(), "aboutDetail");
+            }
+            if (id == R.id.action_edit){
+                ((DetailFragment) mfragment).setEditable(true);
+            }
+
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -121,4 +134,9 @@ public class DashBoardActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public void openDrawer(){
+        if (mNavigationDrawerFragment != null){
+            mNavigationDrawerFragment.openDrawer();
+        }
+    }
 }

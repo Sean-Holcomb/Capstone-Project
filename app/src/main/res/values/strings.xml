@@ -20,12 +20,16 @@
     <string name="past_label">Past Goals</string>
 
     <!--Detail Strings -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
     <string name="milestones">Milestones</string>
     <string name="add_milestone">Add Milestone</string>
     <string name="percent_sign">\u0025</string>
     <string name="by">by </string>
     <string name="how">To do this I will:</string>
     <string name="a_week"> days a week</string>
+    <string name="title">Title</string>
+    <string name="due_date">Due Date</string>
 
     <!--Focus Timer Strings -->
     <string name="time_for">Time For</string>
