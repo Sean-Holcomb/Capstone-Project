@@ -24,18 +24,18 @@ public class GoalDbHelper extends SQLiteOpenHelper{
         // Create a table to hold locations.  A location consists of the string supplied in the
         // location setting, the city name, and the latitude and longitude
         final String SQL_CREATE_GOAL_TABLE = "CREATE TABLE " + GoalEntry.TABLE_NAME + " (" +
-                GoalEntry._ID + " INTEGER PRIMARY KEY," +
+                GoalEntry._ID + " INTEGER PRIMARY KEY, " +
                 GoalEntry.COLUMN_ID + " TEXT  NOT NULL, " +
                 GoalEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 GoalEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                GoalEntry.COLUMN_START_DATE+ " REAL NOT NULL " +
-                GoalEntry.COLUMN_DUE_DATE + " REAL NOT NULL " +
-                GoalEntry.COLUMN_TASK + " TEXT NOT NULL " +
-                GoalEntry.COLUMN_FREQUENCY + " INTEGER NOT NULL " +
-                GoalEntry.COLUMN_TOTAL_TASKS + " INTEGER NOT NULL " +
-                GoalEntry.COLUMN_TASKS_DONE + " INTEGER NOT NULL " +
-                GoalEntry.COLUMN_TASKS_MISSED + " INTEGER NOT NULL " +
-                GoalEntry.COLUMN_TASKS_REMAINING + " INTEGER NOT NULL " +
+                GoalEntry.COLUMN_START_DATE+ " REAL NOT NULL, " +
+                GoalEntry.COLUMN_DUE_DATE + " REAL NOT NULL, " +
+                GoalEntry.COLUMN_TASK + " TEXT NOT NULL, " +
+                GoalEntry.COLUMN_FREQUENCY + " INTEGER NOT NULL, " +
+                GoalEntry.COLUMN_TOTAL_TASKS + " INTEGER NOT NULL, " +
+                GoalEntry.COLUMN_TASKS_DONE + " INTEGER NOT NULL, " +
+                GoalEntry.COLUMN_TASKS_MISSED + " INTEGER NOT NULL, " +
+                GoalEntry.COLUMN_TASKS_REMAINING + " INTEGER NOT NULL, " +
                 GoalEntry.COLUMN_STATUS + " TEXT NOT NULL " +
                 " );";
 

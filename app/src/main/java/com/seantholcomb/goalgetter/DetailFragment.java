@@ -183,7 +183,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void addDummyData() {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(GoalContract.GoalEntry.COLUMN_ID,"");
+        contentValues.put(GoalContract.GoalEntry.COLUMN_ID,"Learn toRead");
         contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
         contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, "Learn toRead");
         contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, 2);
@@ -234,7 +234,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mGoalAdapter.swapCursor(null);
+        //mGoalAdapter.swapCursor(null);
     }
 
 

@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,18 +68,19 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
-        RecyclerView currentList = (RecyclerView) rootView.findViewById(R.id.current_list);
-        RecyclerView todoList = (RecyclerView) rootView.findViewById(R.id.todo_list);
-        RecyclerView pastList = (RecyclerView) rootView.findViewById(R.id.past_list);
-        currentList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        pastList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        todoList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mCurrentList = (RecyclerView) rootView.findViewById(R.id.current_list);
+        mTodoList = (RecyclerView) rootView.findViewById(R.id.todo_list);
+        mPastList = (RecyclerView) rootView.findViewById(R.id.past_list);
+        mCurrentList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mPastList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mTodoList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mGoalAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
             @Override
@@ -106,9 +108,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
             }
         });
-        currentList.setAdapter(mGoalAdapter);
-        pastList.setAdapter(mPastAdapter);
-        todoList.setAdapter(mTodoAdapter);
+        mCurrentList.setAdapter(mGoalAdapter);
+        mPastList.setAdapter(mPastAdapter);
+        mTodoList.setAdapter(mTodoAdapter);
         return rootView;
     }
 
@@ -119,6 +121,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
 
         Uri goalUri = GoalContract.GoalEntry.CONTENT_URI;
+
 
         return new CursorLoader(getActivity(),
                 goalUri,
@@ -131,7 +134,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mGoalAdapter.swapCursor(data);
-
+        mGoalAdapter.notifyDataSetChanged();
+        mCurrentList.setAdapter(mGoalAdapter);
+        Log.e("EEEEEE", "MMMMMMMM");
 
     }
 
@@ -149,7 +154,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mGoalAdapter.swapCursor(null);
+        //mGoalAdapter.swapCursor(null);
     }
 
 

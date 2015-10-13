@@ -3,36 +3,42 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/graph_padding"
-    android:paddingTop="@dimen/graph_padding">
+    android:paddingTop="@dimen/graph_padding"
+
+   >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="20dp"
+        android:orientation="horizontal"
+        >
 
         <View
             android:id="@+id/green_bar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@color/green" />
+            android:background="@color/green"
+            />
 
         <View
             android:id="@+id/clear_bar"
             android:layout_width="0dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            />
 
         <View
             android:id="@+id/red_bar"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@color/red" />
+            android:background="@color/red"
+            />
     </LinearLayout>
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="test" />
+        />
 
     <TextView
         android:id="@+id/percent"

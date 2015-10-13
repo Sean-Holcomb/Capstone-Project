@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
+            Log.e("EEEEEE", "FFFFFFFF");
             mCursor.moveToPosition(adapterPosition);
             int idColumnIndex = mCursor.getColumnIndex(GoalContract.GoalEntry.COLUMN_ID);
             mClickHandler.onClick(mCursor.getString(idColumnIndex), this);
@@ -106,6 +108,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         setBarWeight(goalAdapterViewHolder.mClearBar, percents[2]);
 
 
+
         //mICM.onBindViewHolder(GoalAdapterViewHolder, position);
     }
     public void setBarWeight(View view, int weight){
@@ -136,7 +139,9 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
 
     @Override
     public int getItemCount() {
-        if ( null == mCursor ) return 0;
+        if ( null == mCursor ) {
+            return 0;
+        }
         return mCursor.getCount();
     }
 

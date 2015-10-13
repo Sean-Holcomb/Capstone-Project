@@ -22,25 +22,30 @@ public class GoalProvider extends ContentProvider {
     static final int GOAL_WITH_MILESTONES = 101;
 
 
-    private static final SQLiteQueryBuilder sGoalQueryBuilder = new SQLiteQueryBuilder();
+    private static final SQLiteQueryBuilder sGoalQueryBuilder;
+
+    static{
+        sGoalQueryBuilder = new SQLiteQueryBuilder();
+
+        sGoalQueryBuilder.setTables(GoalContract.GoalEntry.TABLE_NAME);
+    }
 
 
-    //location.location_setting = ? AND date >= ?
+
     private static final String sGoalSelection =
             GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = " + GoalContract.GoalEntry.GOAL + " ";
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
-    //location.location_setting = ? AND date = ?
+
     private static final String sGoalAndMilestoneSelection =
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_ID + " = ? ";
 
     private Cursor getGoal(Uri uri, String[] projection, String sortOrder) {
-
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sGoalSelection,
-                null,
+                new String[] {GoalContract.GoalEntry.GOAL},
                 null,
                 null,
                 sortOrder

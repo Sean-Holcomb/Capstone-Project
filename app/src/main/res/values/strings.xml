@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Goal Getter</string>
+    <string name="content_authority">com.seantholcomb.goalgetter</string>
 
     <string name="title_section1">Dashboard</string>
     <string name="title_section2">Add Goal</string>
