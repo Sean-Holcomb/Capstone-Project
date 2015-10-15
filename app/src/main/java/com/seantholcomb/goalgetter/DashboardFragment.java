@@ -9,7 +9,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import android.view.ViewGroup;
 import com.seantholcomb.goalgetter.data.GoalContract;
 
 
-public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
     private GoalAdapter mGoalAdapter;
@@ -56,6 +55,10 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_MISSED_TASKS = 10;
     static final int COL_STATUS = 11;
 
+    final int CURRENT_LOADER = 0;
+    final int PAST_LOADER = 1;
+    final int TODO_LOADER = 2;
+
     public interface Callback {
         public void onItemSelected(Uri GoalUri, GoalAdapter.GoalAdapterViewHolder vh);
     }
@@ -68,7 +71,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(CURRENT_LOADER, null, this);
+        getLoaderManager().initLoader(PAST_LOADER, null, this);
+        getLoaderManager().initLoader(TODO_LOADER, null, this);
     }
 
     @Override
@@ -86,7 +91,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
             @Override
             public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
                 ((Callback) getActivity())
-                        .onItemSelected(GoalContract.GoalEntry.CONTENT_URI,
+                        .onItemSelected(GoalContract.GoalEntry.GOAL_URI,
                                 vh
                         );
             }
@@ -96,7 +101,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
             @Override
             public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
                 ((Callback) getActivity())
-                        .onItemSelected(GoalContract.GoalEntry.CONTENT_URI,
+                        .onItemSelected(GoalContract.GoalEntry.GOAL_URI,
                                 vh
                         );
             }
@@ -118,9 +123,20 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
         String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
-
-
-        Uri goalUri = GoalContract.GoalEntry.CONTENT_URI;
+        Uri goalUri;
+        switch (i) {
+            case CURRENT_LOADER:
+                goalUri = GoalContract.GoalEntry.CURRENT_URI;
+                break;
+            case PAST_LOADER:
+                goalUri = GoalContract.GoalEntry.PAST_URI;
+                break;
+            case TODO_LOADER:
+                goalUri = GoalContract.GoalEntry.TODO_URI;
+                break;
+            default:
+                goalUri = GoalContract.GoalEntry.GOAL_URI;
+        }
 
 
         return new CursorLoader(getActivity(),
@@ -133,13 +149,23 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mGoalAdapter.swapCursor(data);
-        mGoalAdapter.notifyDataSetChanged();
-        mCurrentList.setAdapter(mGoalAdapter);
-        Log.e("EEEEEE", "MMMMMMMM");
+        int id = loader.getId();
+        switch (id) {
+            case CURRENT_LOADER:
+                mGoalAdapter.swapCursor(data);
+                mGoalAdapter.notifyDataSetChanged();
+                break;
+            case PAST_LOADER:
+                mPastAdapter.swapCursor(data);
+                mPastAdapter.notifyDataSetChanged();
+                break;
+            case TODO_LOADER:
+                mTodoAdapter.swapCursor(data);
+                mTodoAdapter.notifyDataSetChanged();
+                break;
+        }
 
     }
-
 
 
     @Override
@@ -156,7 +182,6 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
         //mGoalAdapter.swapCursor(null);
     }
-
 
 
 }

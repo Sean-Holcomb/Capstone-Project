@@ -280,4 +280,16 @@ public class NavigationDrawerFragment extends Fragment {
             mDrawerLayout.openDrawer(mFragmentContainerView);
         }
     }
+
+    public void closeDrawer(){
+        if(isDrawerOpen()){
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        }
+    }
+
+    public void setPostion(int position) {
+        if (mDrawerListView != null) {
+            mDrawerListView.setItemChecked(position, true);
+        }
+    }
 }

@@ -66,8 +66,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Button saveButton;
     private Button cancelButton;
 
-    private final String GOAL_KEY = "goal_key";
-    private final String DATE_KEY = "date_key";
+    private final String TITLE_KEY = "title";
+    private final String DATE_KEY = "due_date";
     private String titleString;
     private String dateString;
     private Boolean isNew;
@@ -80,9 +80,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        if (args != null && args.containsKey(GOAL_KEY)) {
+        if (args != null && args.containsKey(TITLE_KEY)) {
 
-            titleString = args.getString(GOAL_KEY);
+            titleString = args.getString(TITLE_KEY);
             dateString = getString(R.string.due_date);
             args.getDouble(DATE_KEY);
             isNew = false;
@@ -194,8 +194,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, 100);
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, 50);
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 50);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE) ;
-        getContext().getContentResolver().insert(GoalContract.GoalEntry.CONTENT_URI, contentValues);
+        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE) ;
+        getContext().getContentResolver().insert(GoalContract.GoalEntry.GOAL_URI, contentValues);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
 
 
-        Uri goalUri = GoalContract.GoalEntry.CONTENT_URI;
+        Uri goalUri = GoalContract.GoalEntry.GOAL_MILESTONE_URI;
 
         return new CursorLoader(getActivity(),
                 goalUri,

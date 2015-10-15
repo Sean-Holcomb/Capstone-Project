@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by seanholcomb on 10/8/15.
@@ -18,8 +19,11 @@ public class GoalProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private GoalDbHelper mOpenHelper;
 
-    static final int GOALS = 100;
+    static final int GOAL = 99;
+    static final int PAST = 100;
     static final int GOAL_WITH_MILESTONES = 101;
+    static final int CURRENT = 102;
+    static final int TODO = 103;
 
 
     private static final SQLiteQueryBuilder sGoalQueryBuilder;
@@ -41,11 +45,29 @@ public class GoalProvider extends ContentProvider {
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_ID + " = ? ";
 
+    private static final String sTodoSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? ";
+
+    private static final String sCurrentSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? OR " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? AND " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
+
+    private static final String sPastSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? AND " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
+
     private Cursor getGoal(Uri uri, String[] projection, String sortOrder) {
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                sGoalSelection,
-                new String[] {GoalContract.GoalEntry.GOAL},
+                null,
+                null,
                 null,
                 null,
                 sortOrder
@@ -60,6 +82,49 @@ public class GoalProvider extends ContentProvider {
                 projection,
                 sGoalAndMilestoneSelection,
                 selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getPastGoals(
+            Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
+
+        Log.e("EEE", "yo");
+
+        return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sPastSelection,
+                new String[] {GoalContract.GoalEntry.COMPLETE, GoalContract.GoalEntry.GOAL},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getCurrentGoal(
+            Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
+
+
+        return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sCurrentSelection,
+                new String[] {GoalContract.GoalEntry.ACTIVE, GoalContract.GoalEntry.PENDING, GoalContract.GoalEntry.GOAL},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getTodo(
+            Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
+
+
+        return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sTodoSelection,
+                new String[] {GoalContract.GoalEntry.ACTIVE},
                 null,
                 null,
                 sortOrder
@@ -83,8 +148,11 @@ public class GoalProvider extends ContentProvider {
         final String authority = GoalContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, GoalContract.PATH_GOAL, GOALS);
-        matcher.addURI(authority, GoalContract.PATH_GOAL + "/*", GOAL_WITH_MILESTONES);
+        matcher.addURI(authority, GoalContract.PATH_PAST, PAST);
+        matcher.addURI(authority, GoalContract.PATH_CURRENT, CURRENT);
+        matcher.addURI(authority, GoalContract.PATH_TODO, TODO);
+        matcher.addURI(authority, GoalContract.PATH_GOAL_MILESTONE, GOAL_WITH_MILESTONES);
+        matcher.addURI(authority, GoalContract.PATH_GOAL, GOAL);
 
         return matcher;
     }
@@ -112,7 +180,13 @@ public class GoalProvider extends ContentProvider {
 
         switch (match) {
             // Student: Uncomment and fill out these two cases
-            case GOALS:
+            case GOAL:
+                return GoalContract.GoalEntry.CONTENT_TYPE;
+            case PAST:
+                return GoalContract.GoalEntry.CONTENT_TYPE;
+            case CURRENT:
+                return GoalContract.GoalEntry.CONTENT_TYPE;
+            case TODO:
                 return GoalContract.GoalEntry.CONTENT_TYPE;
             case GOAL_WITH_MILESTONES:
                 return GoalContract.GoalEntry.CONTENT_TYPE;
@@ -128,17 +202,30 @@ public class GoalProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            // "goal"
-            case GOALS: {
-                retCursor = getGoal(uri, projection, sortOrder);
+
+
+
+
+            case PAST:
+                retCursor = getPastGoals(uri, projection, selectionArgs, sortOrder);
                 break;
-            }
-            // "goal/*"
-            case GOAL_WITH_MILESTONES: {
+
+
+            case GOAL_WITH_MILESTONES:
                 retCursor = getGoalAndMilestones(uri, projection, selectionArgs, sortOrder);
                 break;
-            }
 
+            case CURRENT:
+                retCursor = getCurrentGoal(uri, projection, selectionArgs, sortOrder);
+                break;
+
+            case TODO:
+                retCursor = getTodo(uri, projection, selectionArgs, sortOrder);
+                break;
+
+            case GOAL:
+                retCursor = getGoal(uri, projection, sortOrder);
+                break;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -157,7 +244,7 @@ public class GoalProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case GOALS: {
+            case GOAL: {
                 normalizeDate(values);
                 long _id = db.insert(GoalContract.GoalEntry.TABLE_NAME, null, values);
                 if (_id > 0)
@@ -181,7 +268,7 @@ public class GoalProvider extends ContentProvider {
         // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
         switch (match) {
-            case GOALS:
+            case GOAL:
                 rowsDeleted = db.delete(
                         GoalContract.GoalEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -232,7 +319,7 @@ public class GoalProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case GOALS:
+            case GOAL:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {

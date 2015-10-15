@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +36,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         public final TextView mTitleView;
         public final TextView mPercentView;
         public final TextView mMinusPercentView;
+        public double due_date;
 
         public GoalAdapterViewHolder(View view) {
             super(view);
@@ -52,7 +52,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            Log.e("EEEEEE", "FFFFFFFF");
+
             mCursor.moveToPosition(adapterPosition);
             int idColumnIndex = mCursor.getColumnIndex(GoalContract.GoalEntry.COLUMN_ID);
             mClickHandler.onClick(mCursor.getString(idColumnIndex), this);
@@ -95,6 +95,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     @Override
     public void onBindViewHolder(GoalAdapterViewHolder goalAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
+        goalAdapterViewHolder.due_date=mCursor.getDouble(DashboardFragment.COL_DUE_DATE);
         int total_tasks = mCursor.getInt(DashboardFragment.COL_TOTAL_TASKS);
         int tasks_done = mCursor.getInt(DashboardFragment.COL_DONE_TASK);
         int tasks_missed = mCursor.getInt(DashboardFragment.COL_MISSED_TASKS);

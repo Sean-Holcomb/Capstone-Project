@@ -29,6 +29,10 @@ public class GoalContract {
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
 
     public static final String PATH_GOAL= "goal";
+    public static final String PATH_TODO= "todo";
+    public static final String PATH_PAST = "past";
+    public static final String PATH_CURRENT = "current";
+    public static final String PATH_GOAL_MILESTONE= "goal_milestone";
 
     // To make it easy to query for the exact date, we normalize all dates that go into
     // the database to the start of the the Julian day at UTC.
@@ -43,8 +47,16 @@ public class GoalContract {
     /* Inner class that defines the table contents of the location table */
     public static final class GoalEntry implements BaseColumns {
 
-        public static final Uri CONTENT_URI =
+        public static final Uri GOAL_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_GOAL).build();
+        public static final Uri CURRENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CURRENT).build();
+        public static final Uri PAST_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PAST).build();
+        public static final Uri TODO_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TODO).build();
+        public static final Uri GOAL_MILESTONE_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_GOAL_MILESTONE).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GOAL;
@@ -80,8 +92,7 @@ public class GoalContract {
 
         //status column states
         public static final String ACTIVE="active";
-        public static final String WAITING = "waiting";
-        public static final String CONCURRENT="concurrent";
+        public static final String PENDING = "pending";
         public static final String COMPLETE="complete";
 
         //Type column type
@@ -90,45 +101,8 @@ public class GoalContract {
 
 
         public static Uri buildGoalUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+            return ContentUris.withAppendedId(BASE_CONTENT_URI, id);
         }
     }
 
-
-/*
-        /*
-            Student: This is the buildWeatherLocation function you filled in.
-
-        public static Uri buildWeatherLocation(String locationSetting) {
-            return CONTENT_URI.buildUpon().appendPath(locationSetting).build();
-        }
-
-        public static Uri buildWeatherLocationWithStartDate(
-                String locationSetting, long startDate) {
-            long normalizedDate = normalizeDate(startDate);
-            return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendQueryParameter(COLUMN_DATE, Long.toString(normalizedDate)).build();
-        }
-
-        public static Uri buildWeatherLocationWithDate(String locationSetting, long date) {
-            return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendPath(Long.toString(normalizeDate(date))).build();
-        }
-
-        public static String getLocationSettingFromUri(Uri uri) {
-            return uri.getPathSegments().get(1);
-        }
-
-        public static long getDateFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
-        }
-
-        public static long getStartDateFromUri(Uri uri) {
-            String dateString = uri.getQueryParameter(COLUMN_DATE);
-            if (null != dateString && dateString.length() > 0)
-                return Long.parseLong(dateString);
-            else
-                return 0;
-        }
-    *////
 }

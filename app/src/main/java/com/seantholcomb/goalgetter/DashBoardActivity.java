@@ -27,6 +27,8 @@ public class DashBoardActivity extends AppCompatActivity
     private CharSequence mTitle;
     private int menuLayout;
     private Fragment mfragment;
+    private final String TITLE_KEY= "title";
+    private final String DUE_DATE_KEY = "due_date";
 
 
     @Override
@@ -74,8 +76,23 @@ public class DashBoardActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(Uri uri, GoalAdapter.GoalAdapterViewHolder vh){
-
-
+        Bundle args = new Bundle();
+        if (vh != null) {
+            String title = String.valueOf(vh.mTitleView.getText());
+            double date =vh.due_date;
+            if (title != null) {
+                args.putString(TITLE_KEY, title);
+                args.putDouble(DUE_DATE_KEY, date);
+            }
+        }
+        Fragment fragment = new DetailFragment();
+        fragment.setArguments(args);
+        mfragment=fragment;
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+        menuLayout= R.menu.detail;
+        invalidateOptionsMenu();
     }
 
 
