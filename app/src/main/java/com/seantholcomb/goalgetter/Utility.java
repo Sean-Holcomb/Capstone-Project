@@ -1,5 +1,10 @@
 package com.seantholcomb.goalgetter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by seanholcomb on 10/9/15.
  */
@@ -26,6 +31,32 @@ public class Utility {
             percents[2] = 100 - iMiss - iDone;
         }
         return percents;
+    }
+
+    public static String getDate(long milliSeconds)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+
+    public static Double getDateDouble(String formattedDate)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date date = formatter.parse(formattedDate);
+            return (double) date.getTime();
+        }catch(ParseException p){
+
+        }
+        return (double) -1;
+
+
     }
 
 }

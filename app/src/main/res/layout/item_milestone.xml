@@ -14,9 +14,8 @@
         android:layout_height="wrap_content"
         android:text="@string/by"
         />
-    <EditText
+    <TextView
         android:id="@+id/milesstone_duedate"
-        android:inputType="date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
@@ -34,8 +33,18 @@
         android:inputType="number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <EditText
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/a_week"/>
+    <CheckBox
+        android:id="@+id/concurrent"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+    <Button
+        android:id="@+id/delete_milestone"
+        android:text="@string/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

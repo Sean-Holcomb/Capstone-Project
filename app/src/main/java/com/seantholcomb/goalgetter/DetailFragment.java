@@ -58,6 +58,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_STATUS = 11;
 
     private GoalAdapter mGoalAdapter;
+    private MilestoneAdapter mMilestoneAdapter;
     private RecyclerView mMilestoneGraph;
     private RecyclerView mMilestoneList;
     private EditText titleView;
@@ -81,11 +82,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null && args.containsKey(TITLE_KEY)) {
-
-            titleString = args.getString(TITLE_KEY);
-            dateString = getString(R.string.due_date);
-            args.getDouble(DATE_KEY);
             isNew = false;
+            titleString = args.getString(TITLE_KEY);
+            double dateDouble = args.getDouble(DATE_KEY);
+            dateString =  Utility.getDate((long) dateDouble);
+            getLoaderManager().initLoader(0, args, this);
+
+
 
         } else {
             isNew = true;
@@ -123,6 +126,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        mMilestoneAdapter = new MilestoneAdapter(getActivity());
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,6 +156,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
         mMilestoneGraph.setAdapter(mGoalAdapter);
+        mMilestoneList.setAdapter(mMilestoneAdapter);
         setEditable(isNew);
         return rootView;
     }
@@ -204,7 +210,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return null;
         }
         String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
-
+        String id = bundle.getString(TITLE_KEY);
 
         Uri goalUri = GoalContract.GoalEntry.GOAL_MILESTONE_URI;
 
@@ -212,13 +218,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 goalUri,
                 Goal_COLUMNS,
                 null,
-                null,
+                new String[] {id},
                 sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mGoalAdapter.swapCursor(data);
+        mGoalAdapter.notifyDataSetChanged();
+        mMilestoneAdapter.swapCursor(data);
+        mMilestoneAdapter.notifyDataSetChanged();
 
 
     }
@@ -259,7 +268,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-
+            ;
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
