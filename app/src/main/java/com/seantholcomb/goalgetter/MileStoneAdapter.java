@@ -34,7 +34,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     private boolean mIsEditable = false;
     private String mID;
     private double mDueDate;
-    private ArrayList<boolean> mConcurrent;
+
 
 
     /**
@@ -103,7 +103,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     @Override
     public void onBindViewHolder(final MilestoneAdapterViewHolder milestoneAdapterViewHolder, final int position) {
         final ContentValues contentValues = mCVArrayList.get(position);
-        mConcurrent.add(position, false);
+
         milestoneAdapterViewHolder.due_date = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         milestoneAdapterViewHolder.mDueDate.setText(Utility.getDate((long) milestoneAdapterViewHolder.due_date));
         milestoneAdapterViewHolder.mTitle.setText(contentValues.getAsString(GoalContract.GoalEntry.COLUMN_NAME));
@@ -114,7 +114,8 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 && !mCVArrayList.get(position - 1).getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
                 .equals(GoalContract.GoalEntry.COMPLETE)) {
             milestoneAdapterViewHolder.mConcurrent.setChecked(true);
-            mConcurrent.set(position, true);
+            contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
+
         }
 
         //Checks if views should be editable or not. If not listeners are not initalized
@@ -134,10 +135,12 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         milestoneAdapterViewHolder.mConcurrent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mConcurrent.set(position, true);
+                if (isChecked
+                        && !contentValues.getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
+                        .equals(GoalContract.GoalEntry.COMPLETE)) {
+                    contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
                 } else{
-                    mConcurrent.set(position, false);
+                    contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
                 }
             }
         });
@@ -147,7 +150,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             @Override
             public void onClick(View v) {
                 mCVArrayList.remove(position);
-                mConcurrent.remove(position);
                 notifyDataSetChanged();
 
             }
@@ -314,7 +316,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         notifyDataSetChanged();
     }
 
-    public void updateTasks(ContentValues contentValues, int position) {
+    public void updateTasks(ContentValues contentValues) {
         int done = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
         double start = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE);
@@ -323,17 +325,14 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         if (freq == 0) {
             contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, done + missed);
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 0);
-        } else if (start == 0) {
-            start = mCVArrayList.get(position - 1).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
-            contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, start);
         } else {
 
             double dif = start - end;
             dif = dif / (1000 * 60 * 60 * 24);
             int difDays = (int) dif;
             difDays = difDays / freq;
-            contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, difDays + done + missed);
-            contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, difDays);
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, difDays);
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, difDays - done - missed);
 
         }
 
@@ -353,8 +352,49 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 }
             }
         }
-        for (int i = 0; i < mCVArrayList.size(); i++){
-            //if ()
+        Calendar calendar = Calendar.getInstance();
+        if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
+            mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
+        }
+        if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)==0){
+            mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
+            updateTasks(mCVArrayList.get(0));
+        }
+        for (int i = 1; i < mCVArrayList.size(); i++){
+            if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
+                    < (double) calendar.getTimeInMillis()){
+                mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
+            }
+
+            if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)){
+                continue;
+            }
+
+
+            if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.PENDING)){
+                if (mCVArrayList.get(i-1).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)){
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
+                }else {
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE,
+                            mCVArrayList.get(i - 1).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE));
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, 0);
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, 0);
+                }
+            }
+
+            if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.CONCURRENT)){
+                mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
+            }
+
+            if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.ACTIVE)) {
+                if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0
+                        || mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
+                        > (double) calendar.getTimeInMillis()) {
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
+                }
+            }
+            updateTasks(mCVArrayList.get(i));
+
         }
     }
 

@@ -94,6 +94,7 @@ public class GoalContract {
         public static final String ACTIVE="active";
         public static final String PENDING = "pending";
         public static final String COMPLETE="complete";
+        public static final String CONCURRENT="concurrent";
 
         //Type column type
         public static final String GOAL = "goal";
