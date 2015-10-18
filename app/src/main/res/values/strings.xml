@@ -32,6 +32,11 @@
     <string name="a_week"> days a week</string>
     <string name="title">Title</string>
     <string name="due_date">Due Date</string>
+    <string name="freq_toast">Must be whole number from 0 to 7.</string>
+    <string name="task_prompt">What do you need to do?</string>
+    <string name="new_milestone">New Milestone</string>
+    <string name="milestone_toast">Please set goal title and due date</string>
+    <string name="title_prompt">New Goal</string>
 
 
     <!--Focus Timer Strings -->

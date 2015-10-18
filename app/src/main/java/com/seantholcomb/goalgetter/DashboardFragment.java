@@ -39,6 +39,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
             GoalContract.GoalEntry.COLUMN_TOTAL_TASKS,
             GoalContract.GoalEntry.COLUMN_TASKS_DONE,
             GoalContract.GoalEntry.COLUMN_TASKS_MISSED,
+            GoalContract.GoalEntry.COLUMN_TASKS_REMAINING,
             GoalContract.GoalEntry.COLUMN_STATUS
     };
 
@@ -53,7 +54,8 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_TOTAL_TASKS = 8;
     static final int COL_DONE_TASK = 9;
     static final int COL_MISSED_TASKS = 10;
-    static final int COL_STATUS = 11;
+    static final int COL_REMAINING_TASKS= 11;
+    static final int COL_STATUS = 12;
 
     final int CURRENT_LOADER = 0;
     final int PAST_LOADER = 1;

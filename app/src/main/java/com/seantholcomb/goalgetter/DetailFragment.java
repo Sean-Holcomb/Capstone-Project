@@ -13,6 +13,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             GoalContract.GoalEntry.COLUMN_TOTAL_TASKS,
             GoalContract.GoalEntry.COLUMN_TASKS_DONE,
             GoalContract.GoalEntry.COLUMN_TASKS_MISSED,
+            GoalContract.GoalEntry.COLUMN_TASKS_REMAINING,
             GoalContract.GoalEntry.COLUMN_STATUS
     };
 
@@ -55,7 +58,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_TOTAL_TASKS = 8;
     static final int COL_DONE_TASK = 9;
     static final int COL_MISSED_TASKS = 10;
-    static final int COL_STATUS = 11;
+    static final int COL_REMAINING = 11;
+    static final int COL_STATUS = 12;
 
     private GoalAdapter mGoalAdapter;
     private MilestoneAdapter mMilestoneAdapter;
@@ -125,13 +129,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 //This does not need to do anything
             }
         });
-
-        mMilestoneAdapter = new MilestoneAdapter(getActivity());
+        if (isNew) {
+            mMilestoneAdapter = new MilestoneAdapter(getActivity());
+        }else{
+            mMilestoneAdapter = new MilestoneAdapter(getActivity(), titleString, Utility.getDateDouble(dateString));
+        }
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isNew = false;
+                mMilestoneAdapter.save();
                 setEditable(false);
             }
         });
@@ -140,10 +148,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(View v) {
                 setEditable(false);
+                mMilestoneAdapter.cancel();
                 if (isNew){
-                    //getActivity().getSupportFragmentManager().beginTransaction()
-                    //        .replace(R.id.container, new DashboardFragment())
-                    //        .commit();
                     ((DashBoardActivity) getActivity()).openDrawer();
                 }
             }
@@ -152,9 +158,30 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         addMilestoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addDummyData();
+                mMilestoneAdapter.addNew();
             }
         });
+
+        titleView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mMilestoneAdapter.setmID(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+
+
         mMilestoneGraph.setAdapter(mGoalAdapter);
         mMilestoneList.setAdapter(mMilestoneAdapter);
         setEditable(isNew);
@@ -166,12 +193,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             cancelButton.setVisibility(View.VISIBLE);
             saveButton.setVisibility(View.VISIBLE);
             addMilestoneButton.setVisibility(View.VISIBLE);
-            if (duedateView.hasOnClickListeners()) {
+            if (!duedateView.hasOnClickListeners()) {
                 duedateView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         DialogFragment newFragment = new DatePickerFragment(v);
                         newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+
                     }
                 });
             }
@@ -182,6 +210,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             duedateView.setOnClickListener(null);
         }
         titleView.setEnabled(editable);
+        mMilestoneAdapter.makeEditable(editable);
 
 
     }
@@ -268,7 +297,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            ;
+
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -276,9 +305,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             if (textView != null) {
-                String s = month + "/" + day + "/" + year;
+                Calendar c = Calendar.getInstance();
+                c.set(year, month, day);
+                String s = Utility.getDate(c.getTimeInMillis());
                 textView.setText(s);
             }
+
         }
     }
 
