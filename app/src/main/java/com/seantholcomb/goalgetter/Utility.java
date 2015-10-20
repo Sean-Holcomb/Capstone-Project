@@ -21,11 +21,13 @@ public class Utility {
         double dMiss = miss/value;
         int iDone = (int) dDone;
         int iMiss = (int) dMiss;
+
         if (total==miss+done) {
             percents[0] = 100-iMiss;
             percents[1] = iMiss;
             percents[2] = 0;
         }else {
+            if (iDone == 0) iDone=1;
             percents[0] = iDone;
             percents[1] = iMiss;
             percents[2] = 100 - iMiss - iDone;

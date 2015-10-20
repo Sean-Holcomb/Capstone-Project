@@ -24,7 +24,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     private Cursor mCursor;
     final private Context mContext;
     final private GoalAdapterOnClickHandler mClickHandler;
-    //final private ItemChoiceManager mICM;
 
     /**
      * Cache of the children views for a forecast list item.
@@ -68,8 +67,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         mContext = context;
         mClickHandler = dh;
         //mEmptyView = emptyView;
-       //mICM = new ItemChoiceManager(this);
-        //mICM.setChoiceMode(choiceMode);
+
     }
 
     /*
@@ -104,13 +102,13 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         int[] percents =Utility.getPercents(total_tasks,tasks_done,tasks_missed);
         goalAdapterViewHolder.mPercentView.setText(percents[0]+"%");
         goalAdapterViewHolder.mMinusPercentView.setText("-" + percents[1] + "%");
+        if (percents[2]==0)goalAdapterViewHolder.mGreenBar.setBackgroundColor(mContext.getResources().getColor(R.color.gold));
         setBarWeight(goalAdapterViewHolder.mGreenBar, percents[0]);
         setBarWeight(goalAdapterViewHolder.mRedBar, percents[1]);
         setBarWeight(goalAdapterViewHolder.mClearBar, percents[2]);
 
 
 
-        //mICM.onBindViewHolder(GoalAdapterViewHolder, position);
     }
     public void setBarWeight(View view, int weight){
         LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) view.getLayoutParams();

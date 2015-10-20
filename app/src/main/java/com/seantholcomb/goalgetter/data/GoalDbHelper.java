@@ -25,7 +25,7 @@ public class GoalDbHelper extends SQLiteOpenHelper{
         // location setting, the city name, and the latitude and longitude
         final String SQL_CREATE_GOAL_TABLE = "CREATE TABLE " + GoalEntry.TABLE_NAME + " (" +
                 GoalEntry._ID + " INTEGER PRIMARY KEY, " +
-                GoalEntry.COLUMN_ID + " TEXT  NOT NULL, " +
+                GoalEntry.COLUMN_ID + " TEXT NOT NULL, " +
                 GoalEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 GoalEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 GoalEntry.COLUMN_START_DATE+ " REAL NOT NULL, " +

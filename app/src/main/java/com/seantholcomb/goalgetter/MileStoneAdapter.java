@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,22 +43,22 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
      * Cache of the children views for a forecast list item.
      */
     public class MilestoneAdapterViewHolder extends RecyclerView.ViewHolder {
-        public final EditText mTitle;
-        public final EditText mTask;
-        public final EditText mFrequency;
-        public final EditText mDueDate;
-        public final CheckBox mConcurrent;
+        public final EditText titleView;
+        public final EditText taskView;
+        public final EditText frequencyView;
+        public final EditText dueDateView;
+        public final CheckBox concurrentBox;
         public final Button mDelete;
         public double due_date;
 
 
         public MilestoneAdapterViewHolder(View view) {
             super(view);
-            mTitle = (EditText) view.findViewById(R.id.milestone_title);
-            mTask = (EditText) view.findViewById(R.id.todo_item);
-            mFrequency = (EditText) view.findViewById(R.id.frequency);
-            mDueDate = (EditText) view.findViewById(R.id.milesstone_duedate);
-            mConcurrent = (CheckBox) view.findViewById(R.id.concurrent);
+            titleView = (EditText) view.findViewById(R.id.milestone_title);
+            taskView = (EditText) view.findViewById(R.id.todo_item);
+            frequencyView = (EditText) view.findViewById(R.id.frequency);
+            dueDateView = (EditText) view.findViewById(R.id.milesstone_duedate);
+            concurrentBox = (CheckBox) view.findViewById(R.id.concurrent);
             mDelete = (Button) view.findViewById(R.id.delete_milestone);
 
 
@@ -95,45 +96,46 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     @Override
     public void onBindViewHolder(final MilestoneAdapterViewHolder milestoneAdapterViewHolder, final int position) {
-        final ContentValues contentValues = mCVArrayList.get(position);
 
-        milestoneAdapterViewHolder.due_date = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
-        milestoneAdapterViewHolder.mDueDate.setText(Utility.getDate((long) milestoneAdapterViewHolder.due_date));
-        milestoneAdapterViewHolder.mTitle.setText(contentValues.getAsString(GoalContract.GoalEntry.COLUMN_NAME));
-        milestoneAdapterViewHolder.mFrequency.setText(String.valueOf(contentValues.get(GoalContract.GoalEntry.COLUMN_FREQUENCY)));
-        milestoneAdapterViewHolder.mTask.setText(contentValues.getAsString(GoalContract.GoalEntry.COLUMN_TASK));
-        if (contentValues.getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.ACTIVE)
+
+        milestoneAdapterViewHolder.due_date = mCVArrayList.get(position).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
+        milestoneAdapterViewHolder.dueDateView.setText(Utility.getDate((long) milestoneAdapterViewHolder.due_date));
+        Log.e("EEE", mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_NAME));
+        milestoneAdapterViewHolder.titleView.setText(mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_NAME));
+        milestoneAdapterViewHolder.frequencyView.setText(String.valueOf(mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_FREQUENCY)));
+        milestoneAdapterViewHolder.taskView.setText(mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
+        if (mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.ACTIVE)
                 && position != 0
                 && !mCVArrayList.get(position - 1).getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
                 .equals(GoalContract.GoalEntry.COMPLETE)) {
-            milestoneAdapterViewHolder.mConcurrent.setChecked(true);
-            contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
+            milestoneAdapterViewHolder.concurrentBox.setChecked(true);
+            mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
 
         }
 
         //Checks if views should be editable or not. If not listeners are not initalized
-        milestoneAdapterViewHolder.mFrequency.setEnabled(mIsEditable);
-        milestoneAdapterViewHolder.mTitle.setEnabled(mIsEditable);
-        milestoneAdapterViewHolder.mTask.setEnabled(mIsEditable);
+        milestoneAdapterViewHolder.frequencyView.setEnabled(mIsEditable);
+        milestoneAdapterViewHolder.titleView.setEnabled(mIsEditable);
+        milestoneAdapterViewHolder.taskView.setEnabled(mIsEditable);
         if (!mIsEditable) {
-            milestoneAdapterViewHolder.mConcurrent.setVisibility(View.GONE);
+            milestoneAdapterViewHolder.concurrentBox.setVisibility(View.GONE);
             milestoneAdapterViewHolder.mDelete.setVisibility(View.GONE);
-            milestoneAdapterViewHolder.mDueDate.setOnClickListener(null);
+            milestoneAdapterViewHolder.dueDateView.setOnClickListener(null);
             return;
         }
-        milestoneAdapterViewHolder.mConcurrent.setVisibility(View.VISIBLE);
+        milestoneAdapterViewHolder.concurrentBox.setVisibility(View.VISIBLE);
         milestoneAdapterViewHolder.mDelete.setVisibility(View.VISIBLE);
 
 
-        milestoneAdapterViewHolder.mConcurrent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        milestoneAdapterViewHolder.concurrentBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked
-                        && !contentValues.getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
+                        && !mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
                         .equals(GoalContract.GoalEntry.COMPLETE)) {
-                    contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
+                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
                 } else {
-                    contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
+                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
                 }
             }
         });
@@ -148,7 +150,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             }
         });
 
-        milestoneAdapterViewHolder.mFrequency.addTextChangedListener(new TextWatcher() {
+        milestoneAdapterViewHolder.frequencyView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -159,10 +161,10 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 if (s.length() > 0) {
                     int freq = Integer.parseInt(s.toString());
                     if (freq >= 0 && freq <= 7) {
-                        contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, freq);
+                        mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_FREQUENCY, freq);
                     } else {
                         Toast.makeText(mContext, mContext.getString(R.string.freq_toast), Toast.LENGTH_SHORT).show();
-                        contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 0);
+                        mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 0);
                     }
                 }
             }
@@ -172,7 +174,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             }
         });
 
-        milestoneAdapterViewHolder.mTask.addTextChangedListener(new TextWatcher() {
+        milestoneAdapterViewHolder.taskView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -180,7 +182,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                contentValues.put(GoalContract.GoalEntry.COLUMN_TASK, s.toString());
+                mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASK, s.toString());
             }
 
             @Override
@@ -190,7 +192,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         });
 
 
-        milestoneAdapterViewHolder.mTitle.addTextChangedListener(new TextWatcher() {
+        milestoneAdapterViewHolder.titleView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -198,7 +200,8 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, s.toString());
+                mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_NAME, s.toString());
+
             }
 
             @Override
@@ -207,7 +210,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             }
         });
 
-        milestoneAdapterViewHolder.mDueDate.addTextChangedListener(new TextWatcher() {
+        milestoneAdapterViewHolder.dueDateView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -216,9 +219,9 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Double duedate = Utility.getDateDouble(s.toString());
-                if (duedate<= mDueDate){
-                    contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
-                }else{
+                if (duedate <= mDueDate) {
+                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
+                } else {
                     Toast.makeText(mContext, mContext.getString(R.string.adapter_date_prompt), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -230,11 +233,11 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         });
 
 
-        milestoneAdapterViewHolder.mDueDate.setOnClickListener(new View.OnClickListener() {
+        milestoneAdapterViewHolder.dueDateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DetailFragment.DatePickerFragment(v);
-                newFragment.show(((FragmentActivity)mContext).getSupportFragmentManager(), "datePicker");
+                newFragment.show(((FragmentActivity) mContext).getSupportFragmentManager(), "datePicker");
             }
         });
 
@@ -260,10 +263,10 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             cursor.moveToPosition(i);
             if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
                 mDueDate = cursor.getDouble(DashboardFragment.COL_DUE_DATE);
-                mID= cursor.getString(DashboardFragment.COL_ID);
+                mID= cursor.getString(DashboardFragment.COL_GOAL_ID);
                 continue;
             }
-            contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_ID));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
             contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
             contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
             contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, cursor.getDouble(DashboardFragment.COL_START_DATE));

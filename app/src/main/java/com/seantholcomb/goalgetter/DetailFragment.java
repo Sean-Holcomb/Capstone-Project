@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,6 +100,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             titleString = args.getString(TITLE_KEY);
             double dateDouble = args.getDouble(DATE_KEY);
             dateString =  Utility.getDate((long) dateDouble);
+            Log.e("EEE", titleString);
+            Log.e("EEE", dateString);
             GoalValue=newGoal();
             getLoaderManager().initLoader(0, args, this);
 
@@ -138,12 +141,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         });
 
         mMilestoneAdapter = new MilestoneAdapter(getActivity());
-
+        if (!isNew){
+            mMilestoneAdapter.setmID(titleString);
+            mMilestoneAdapter.setDueDate(Utility.getDateDouble(dateString));
+        }
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isNew = false;
                 ArrayList<ContentValues> CVAL = mMilestoneAdapter.save();
+                Log.e("EEEEEEE", titleString);
                 getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
                 titleString = GoalValue.getAsString(GoalContract.GoalEntry.COLUMN_ID);
                 double date = GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
@@ -155,6 +162,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 Bundle args = new Bundle();
                 args.putString(TITLE_KEY, titleString);
                 args.putDouble(DATE_KEY, date);
+                Log.e("EEE", titleString);
+                Log.e("EEEG", date+"");
+                Log.e("EEE", dateString);
                 ((Callback) getActivity()).onSave(args);
                 //setEditable(false);
             }
@@ -281,7 +291,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
             if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_ID));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_START_DATE, cursor.getDouble(DashboardFragment.COL_START_DATE));
@@ -293,6 +303,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, cursor.getInt(DashboardFragment.COL_MISSED_TASKS));
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, cursor.getInt(DashboardFragment.COL_REMAINING_TASKS));
                 GoalValue.put(GoalContract.GoalEntry.COLUMN_STATUS, cursor.getString(DashboardFragment.COL_STATUS));
+                return;
             }
         }
     }

@@ -47,12 +47,12 @@ public class GoalProvider extends ContentProvider {
 
     private static final String sTodoSelection =
             GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? ";
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? AND " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
     private static final String sCurrentSelection =
             GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? OR " +
-                    GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? AND " +
                     GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
@@ -91,7 +91,7 @@ public class GoalProvider extends ContentProvider {
     private Cursor getPastGoals(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-        Log.e("EEE", "yo");
+        Log.e("EEE", "yo past");
 
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -106,11 +106,11 @@ public class GoalProvider extends ContentProvider {
     private Cursor getCurrentGoal(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-
+        Log.e("EEE", "yo current");
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sCurrentSelection,
-                new String[] {GoalContract.GoalEntry.ACTIVE, GoalContract.GoalEntry.PENDING, GoalContract.GoalEntry.GOAL},
+                new String[] {GoalContract.GoalEntry.ACTIVE, GoalContract.GoalEntry.GOAL},
                 null,
                 null,
                 sortOrder
@@ -120,11 +120,11 @@ public class GoalProvider extends ContentProvider {
     private Cursor getTodo(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-
+        Log.e("EEE", "yo todo");
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sTodoSelection,
-                new String[] {GoalContract.GoalEntry.ACTIVE},
+                new String[] {GoalContract.GoalEntry.ACTIVE, GoalContract.GoalEntry.MILESTONE},
                 null,
                 null,
                 sortOrder
