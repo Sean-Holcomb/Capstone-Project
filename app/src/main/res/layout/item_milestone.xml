@@ -14,10 +14,11 @@
         android:layout_height="wrap_content"
         android:text="@string/by"
         />
-    <TextView
+    <EditText
         android:id="@+id/milesstone_duedate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:editable="false"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

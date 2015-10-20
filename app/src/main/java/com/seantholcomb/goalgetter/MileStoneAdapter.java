@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,7 +15,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
@@ -37,6 +37,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
 
 
+
     /**
      * Cache of the children views for a forecast list item.
      */
@@ -44,7 +45,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         public final EditText mTitle;
         public final EditText mTask;
         public final EditText mFrequency;
-        public final TextView mDueDate;
+        public final EditText mDueDate;
         public final CheckBox mConcurrent;
         public final Button mDelete;
         public double due_date;
@@ -55,7 +56,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             mTitle = (EditText) view.findViewById(R.id.milestone_title);
             mTask = (EditText) view.findViewById(R.id.todo_item);
             mFrequency = (EditText) view.findViewById(R.id.frequency);
-            mDueDate = (TextView) view.findViewById(R.id.milesstone_duedate);
+            mDueDate = (EditText) view.findViewById(R.id.milesstone_duedate);
             mConcurrent = (CheckBox) view.findViewById(R.id.concurrent);
             mDelete = (Button) view.findViewById(R.id.delete_milestone);
 
@@ -68,17 +69,9 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     public MilestoneAdapter(Context context) {
         mContext = context;
         mCVArrayList = new ArrayList<ContentValues>();
-        addFirst();
         //mEmptyView = emptyView;
     }
 
-    public MilestoneAdapter(Context context, String title, double duedate) {
-        mContext = context;
-        mCVArrayList = new ArrayList<ContentValues>();
-        mID = title;
-        mDueDate = duedate;
-        //mEmptyView = emptyView;
-    }
 
     /*
         This takes advantage of the fact that the viewGroup passed to onCreateViewHolder is the
@@ -139,7 +132,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                         && !contentValues.getAsString(GoalContract.GoalEntry.COLUMN_STATUS)
                         .equals(GoalContract.GoalEntry.COMPLETE)) {
                     contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.CONCURRENT);
-                } else{
+                } else {
                     contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
                 }
             }
@@ -169,6 +162,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                         contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, freq);
                     } else {
                         Toast.makeText(mContext, mContext.getString(R.string.freq_toast), Toast.LENGTH_SHORT).show();
+                        contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 0);
                     }
                 }
             }
@@ -213,15 +207,34 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             }
         });
 
+        milestoneAdapterViewHolder.mDueDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Double duedate = Utility.getDateDouble(s.toString());
+                if (duedate<= mDueDate){
+                    contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
+                }else{
+                    Toast.makeText(mContext, mContext.getString(R.string.adapter_date_prompt), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
         milestoneAdapterViewHolder.mDueDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO show date picker and save due date
-
                 DialogFragment newFragment = new DetailFragment.DatePickerFragment(v);
-                //newFragment.show(mContext.getSupportFragmentManager(), "datePicker");
-
+                newFragment.show(((FragmentActivity)mContext).getSupportFragmentManager(), "datePicker");
             }
         });
 
@@ -230,19 +243,26 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     public void setmID(String id) {
         mID = id;
+        for (int i = 0; i < mCVArrayList.size(); i++) {
+            mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_ID, id);
+        }
     }
 
     public void setDueDate(Double dueDate) {
         mDueDate = dueDate;
     }
 
+
     public void makeValue(Cursor cursor) {
         mCVArrayList.clear();
         ContentValues contentValues = new ContentValues();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
-            if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL))
+            if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
+                mDueDate = cursor.getDouble(DashboardFragment.COL_DUE_DATE);
+                mID= cursor.getString(DashboardFragment.COL_ID);
                 continue;
+            }
             contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_ID));
             contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
             contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
@@ -283,26 +303,9 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         }
     }
 
-    public void addFirst() {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "");
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, mContext.getString(R.string.title_prompt));
-        contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASK, mContext.getString(R.string.task_prompt));
-        contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 0);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
-        mCVArrayList.add(contentValues);
-        notifyDataSetChanged();
-
-    }
 
     public ArrayList<ContentValues> save() {
+        arrangeForSave();
         return mCVArrayList;
     }
 
@@ -338,7 +341,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     }
 
-    public void arrangeforSave(){
+    public void arrangeForSave(){
         ContentValues contentValues1;
         ContentValues contentValues2;
         for (int i = 0; i < mCVArrayList.size(); i++){
@@ -353,12 +356,14 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             }
         }
         Calendar calendar = Calendar.getInstance();
-        if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
-            mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
-        }
-        if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)==0){
-            mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
-            updateTasks(mCVArrayList.get(0));
+        if (mCVArrayList.size()!=0) {
+            if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
+                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
+            }
+            if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0) {
+                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
+                updateTasks(mCVArrayList.get(0));
+            }
         }
         for (int i = 1; i < mCVArrayList.size(); i++){
             if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)

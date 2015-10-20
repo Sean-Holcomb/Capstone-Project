@@ -14,7 +14,7 @@ import android.view.MenuItem;
 
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        DashboardFragment.Callback {
+        DashboardFragment.Callback, DetailFragment.Callback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -95,6 +95,17 @@ public class DashBoardActivity extends AppCompatActivity
         invalidateOptionsMenu();
     }
 
+    @Override
+    public void onSave(Bundle args){
+        Fragment fragment = new DetailFragment();
+        fragment.setArguments(args);
+        mfragment=fragment;
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+        menuLayout= R.menu.detail;
+        invalidateOptionsMenu();
+    }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
