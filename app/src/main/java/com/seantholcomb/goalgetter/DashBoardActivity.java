@@ -15,7 +15,8 @@ import android.view.MenuItem;
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         DashboardFragment.Callback, DetailFragment.Callback {
-
+    //TODO write method to update Goal tasks
+    //TODo write method to clean up stray milestones
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -150,6 +151,10 @@ public class DashBoardActivity extends AppCompatActivity
             }
             if (id == R.id.action_edit){
                 ((DetailFragment) mfragment).setEditable(true);
+            }
+
+            if (id == R.id.action_delete){
+                ((DetailFragment) mfragment).deleteGoal();
             }
 
         }

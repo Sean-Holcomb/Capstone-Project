@@ -16,13 +16,18 @@ public class Utility {
     */
     public static int[] getPercents(int total, int done, int miss){
         int[] percents = new int[3];
+
         double value = (double)total/100;
         double dDone = done/value;
         double dMiss = miss/value;
         int iDone = (int) dDone;
         int iMiss = (int) dMiss;
 
-        if (total==miss+done) {
+        if (total==0){
+            percents[0] = 1;
+            percents[1] = 0;
+            percents[2] = 99;
+        }else if (total==miss+done) {
             percents[0] = 100-iMiss;
             percents[1] = iMiss;
             percents[2] = 0;

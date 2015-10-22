@@ -223,6 +223,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                     mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
                 } else {
                     Toast.makeText(mContext, mContext.getString(R.string.adapter_date_prompt), Toast.LENGTH_SHORT).show();
+                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_DUE_DATE, mDueDate);
                 }
             }
 
@@ -246,6 +247,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     public void setmID(String id) {
         mID = id;
+        if(mCVArrayList!=null)
         for (int i = 0; i < mCVArrayList.size(); i++) {
             mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_ID, id);
         }
@@ -253,12 +255,20 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     public void setDueDate(Double dueDate) {
         mDueDate = dueDate;
+        if(mCVArrayList!=null)
+        for (int i = 0;i<mCVArrayList.size();i++){
+            if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)> dueDate){
+                mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_DUE_DATE, dueDate);
+            }
+        }
+        notifyDataSetChanged();
     }
 
 
     public void makeValue(Cursor cursor) {
         mCVArrayList.clear();
         ContentValues contentValues = new ContentValues();
+        if(cursor != null)
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
             if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
@@ -364,13 +374,13 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
             }
             if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0) {
-                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
+                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(calendar.getTimeInMillis()));
                 updateTasks(mCVArrayList.get(0));
             }
         }
         for (int i = 1; i < mCVArrayList.size(); i++){
             if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
-                    < (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())){
+                    < (double) GoalContract.normalizeDate(calendar.getTimeInMillis())){
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
             }
 
@@ -397,8 +407,8 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.ACTIVE)) {
                 if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0
                         || mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
-                        > (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())) {
-                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
+                        > (double) GoalContract.normalizeDate(calendar.getTimeInMillis())) {
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(calendar.getTimeInMillis()));
                 }
             }
             updateTasks(mCVArrayList.get(i));
@@ -419,6 +429,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void swapCursor(Cursor newCursor) {
+        Log.e("EEE", "swap");
         mCursor = newCursor;
         makeValue(mCursor);
         notifyDataSetChanged();

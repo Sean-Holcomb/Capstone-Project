@@ -39,9 +39,6 @@ public class GoalProvider extends ContentProvider {
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
-    private static final String sUpdateSelection =
-            GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry._ID + " = ? ";
 
 
     private static final String sGoalAndMilestoneSelection =
@@ -303,7 +300,7 @@ public class GoalProvider extends ContentProvider {
         int rowsUpdated;
 
         normalizeDate(values);
-        rowsUpdated = db.update(GoalContract.GoalEntry.TABLE_NAME, values, sUpdateSelection,
+        rowsUpdated = db.update(GoalContract.GoalEntry.TABLE_NAME, values, selection,
                 selectionArgs);
 
 

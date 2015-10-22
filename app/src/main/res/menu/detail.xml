@@ -6,8 +6,13 @@
         android:title="@string/edit"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_about_detail"
+        android:id="@+id/action_delete"
         android:orderInCategory="2"
+        android:title="@string/action_delete"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about_detail"
+        android:orderInCategory="3"
         android:title="@string/about_detial"
         app:showAsAction="never" />
     <item

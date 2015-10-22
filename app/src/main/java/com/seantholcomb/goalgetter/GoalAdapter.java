@@ -1,5 +1,6 @@
 package com.seantholcomb.goalgetter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
+
+import java.util.Calendar;
 
 /**
  * Created by seanholcomb on 10/9/15.
@@ -24,6 +27,11 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     private Cursor mCursor;
     final private Context mContext;
     final private GoalAdapterOnClickHandler mClickHandler;
+    private static final String sUpdateGoalSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_ID + " = ? AND " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
     /**
      * Cache of the children views for a forecast list item.
@@ -35,7 +43,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         public final TextView mTitleView;
         public final TextView mPercentView;
         public final TextView mMinusPercentView;
-        public double due_date;
+        public long due_date;
 
         public GoalAdapterViewHolder(View view) {
             super(view);
@@ -93,7 +101,9 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     @Override
     public void onBindViewHolder(GoalAdapterViewHolder goalAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
-        goalAdapterViewHolder.due_date=mCursor.getDouble(DashboardFragment.COL_DUE_DATE);
+        goalAdapterViewHolder.due_date=mCursor.getLong(DashboardFragment.COL_DUE_DATE);
+        checkDueDate(goalAdapterViewHolder, position);
+
         int total_tasks = mCursor.getInt(DashboardFragment.COL_TOTAL_TASKS);
         int tasks_done = mCursor.getInt(DashboardFragment.COL_DONE_TASK);
         int tasks_missed = mCursor.getInt(DashboardFragment.COL_MISSED_TASKS);
@@ -104,6 +114,8 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         goalAdapterViewHolder.mMinusPercentView.setText("-" + percents[1] + "%");
         if (mCursor.getString(DashboardFragment.COL_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
             goalAdapterViewHolder.mGreenBar.setBackgroundColor(mContext.getResources().getColor(R.color.gold));
+            percents[0]=percents[0]+percents[2];
+            percents[2]=0;
         }
         setBarWeight(goalAdapterViewHolder.mGreenBar, percents[0]);
         setBarWeight(goalAdapterViewHolder.mRedBar, percents[1]);
@@ -112,6 +124,34 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
 
 
     }
+    public void checkDueDate(GoalAdapterViewHolder goalAdapterViewHolder, int position ){
+        mCursor.moveToPosition(position);
+        if (goalAdapterViewHolder.due_date
+                < GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())
+                && !mCursor.getString(DashboardFragment.COL_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put(GoalContract.GoalEntry.COLUMN_ID, mCursor.getString(DashboardFragment.COL_GOAL_ID));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, mCursor.getString(DashboardFragment.COL_TYPE));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, mCursor.getString(DashboardFragment.COL_NAME));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, mCursor.getDouble(DashboardFragment.COL_START_DATE));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, mCursor.getDouble(DashboardFragment.COL_DUE_DATE));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TASK, mCursor.getString(DashboardFragment.COL_TASK));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, mCursor.getInt(DashboardFragment.COL_FREQUENCY));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, mCursor.getInt(DashboardFragment.COL_TOTAL_TASKS));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, mCursor.getInt(DashboardFragment.COL_DONE_TASK)
+                    + mCursor.getInt(DashboardFragment.COL_REMAINING_TASKS));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, mCursor.getInt(DashboardFragment.COL_MISSED_TASKS));
+            contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 0);
+            contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
+            String selectionArgs = contentValues.getAsString(GoalContract.GoalEntry.COLUMN_ID);
+            mContext.getContentResolver().update(GoalContract.BASE_CONTENT_URI,
+                    contentValues,
+                    sUpdateGoalSelection,
+                    new String[]{selectionArgs, GoalContract.GoalEntry.GOAL});
+        }
+    }
+
     public void setBarWeight(View view, int weight){
         LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) view.getLayoutParams();
 

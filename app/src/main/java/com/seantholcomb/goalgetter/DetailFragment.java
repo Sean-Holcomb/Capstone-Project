@@ -100,12 +100,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             titleString = args.getString(TITLE_KEY);
             double dateDouble = args.getDouble(DATE_KEY);
             dateString =  Utility.getDate((long) dateDouble);
-            Log.e("EEE", titleString);
-            Log.e("EEE", dateString);
             GoalValue=newGoal();
             getLoaderManager().initLoader(0, args, this);
-
-
 
         } else {
             isNew = true;
@@ -217,7 +213,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 if (duedate>= GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)){
                     mMilestoneAdapter.setDueDate(duedate);
                     GoalValue.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
-                }else{
+                }else if (duedate != -1.0){
                     Toast.makeText(getActivity(), getString(R.string.date_prompt), Toast.LENGTH_SHORT).show();
                 }
 
@@ -282,6 +278,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE) ;
         //getContext().getContentResolver().insert(GoalContract.GoalEntry.GOAL_URI, contentValues);
     }
+
+    public void deleteGoal() {
+        getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
+        Bundle args = new Bundle();
+        ((Callback) getActivity()).onSave(args);
+    }
+
 
     public void getGoal(Cursor cursor){
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -411,7 +414,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             if (dateView != null) {
                 Calendar c = Calendar.getInstance();
                 c.set(year, month, day);
-                String s = Utility.getDate(GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
+                String s = Utility.getDate(GoalContract.normalizeDate(c.getTimeInMillis()));
                 dateView.setText(s);
             }
 
