@@ -364,13 +364,13 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
             }
             if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0) {
-                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
+                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
                 updateTasks(mCVArrayList.get(0));
             }
         }
         for (int i = 1; i < mCVArrayList.size(); i++){
             if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
-                    < (double) calendar.getTimeInMillis()){
+                    < (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())){
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
             }
 
@@ -397,8 +397,8 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.ACTIVE)) {
                 if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0
                         || mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
-                        > (double) calendar.getTimeInMillis()) {
-                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) calendar.getTimeInMillis());
+                        > (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())) {
+                    mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
                 }
             }
             updateTasks(mCVArrayList.get(i));

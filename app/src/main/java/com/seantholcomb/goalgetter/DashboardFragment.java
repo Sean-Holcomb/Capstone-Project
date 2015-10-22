@@ -9,7 +9,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,12 +109,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
             }
         });
 
-        mTodoAdapter = new TodoAdapter(getActivity(), new TodoAdapter.TodoAdapterOnClickHandler() {
-            @Override
-            public void onClick(String id, TodoAdapter.TodoAdapterViewHolder vh) {
-
-            }
-        });
+        mTodoAdapter = new TodoAdapter(getActivity());
         mCurrentList.setAdapter(mGoalAdapter);
         mPastList.setAdapter(mPastAdapter);
         mTodoList.setAdapter(mTodoAdapter);
@@ -129,15 +123,12 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         Uri goalUri;
         switch (i) {
             case CURRENT_LOADER:
-                Log.e("EEE", "Current loaded");
                 goalUri = GoalContract.GoalEntry.CURRENT_URI;
                 break;
             case PAST_LOADER:
-                Log.e("EEE", "past loaded");
                 goalUri = GoalContract.GoalEntry.PAST_URI;
                 break;
             case TODO_LOADER:
-                Log.e("EEE", "todo loaded");
                 goalUri = GoalContract.GoalEntry.TODO_URI;
                 break;
             default:

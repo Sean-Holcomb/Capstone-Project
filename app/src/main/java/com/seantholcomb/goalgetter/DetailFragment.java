@@ -162,11 +162,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 Bundle args = new Bundle();
                 args.putString(TITLE_KEY, titleString);
                 args.putDouble(DATE_KEY, date);
-                Log.e("EEE", titleString);
-                Log.e("EEEG", date+"");
-                Log.e("EEE", dateString);
                 ((Callback) getActivity()).onSave(args);
-                //setEditable(false);
             }
         });
 
@@ -313,7 +309,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "");
         contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
         contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, "");
-        contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) Calendar.getInstance().getTimeInMillis());
+        contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
         contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, 0);
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASK, "");
         contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 0);
@@ -415,7 +411,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             if (dateView != null) {
                 Calendar c = Calendar.getInstance();
                 c.set(year, month, day);
-                String s = Utility.getDate(c.getTimeInMillis());
+                String s = Utility.getDate(GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis()));
                 dateView.setText(s);
             }
 

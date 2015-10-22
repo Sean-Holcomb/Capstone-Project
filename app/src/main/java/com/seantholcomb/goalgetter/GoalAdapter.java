@@ -102,7 +102,9 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         int[] percents =Utility.getPercents(total_tasks,tasks_done,tasks_missed);
         goalAdapterViewHolder.mPercentView.setText(percents[0]+"%");
         goalAdapterViewHolder.mMinusPercentView.setText("-" + percents[1] + "%");
-        if (percents[2]==0)goalAdapterViewHolder.mGreenBar.setBackgroundColor(mContext.getResources().getColor(R.color.gold));
+        if (mCursor.getString(DashboardFragment.COL_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
+            goalAdapterViewHolder.mGreenBar.setBackgroundColor(mContext.getResources().getColor(R.color.gold));
+        }
         setBarWeight(goalAdapterViewHolder.mGreenBar, percents[0]);
         setBarWeight(goalAdapterViewHolder.mRedBar, percents[1]);
         setBarWeight(goalAdapterViewHolder.mClearBar, percents[2]);

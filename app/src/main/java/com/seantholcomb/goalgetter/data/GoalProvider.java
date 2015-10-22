@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 /**
  * Created by seanholcomb on 10/8/15.
@@ -39,6 +38,10 @@ public class GoalProvider extends ContentProvider {
     private static final String sGoalSelection =
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
+
+    private static final String sUpdateSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry._ID + " = ? ";
 
 
     private static final String sGoalAndMilestoneSelection =
@@ -91,7 +94,6 @@ public class GoalProvider extends ContentProvider {
     private Cursor getPastGoals(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-        Log.e("EEE", "yo past");
 
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -106,7 +108,6 @@ public class GoalProvider extends ContentProvider {
     private Cursor getCurrentGoal(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-        Log.e("EEE", "yo current");
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sCurrentSelection,
@@ -120,7 +121,7 @@ public class GoalProvider extends ContentProvider {
     private Cursor getTodo(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
-        Log.e("EEE", "yo todo");
+
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sTodoSelection,
@@ -302,7 +303,7 @@ public class GoalProvider extends ContentProvider {
         int rowsUpdated;
 
         normalizeDate(values);
-        rowsUpdated = db.update(GoalContract.GoalEntry.TABLE_NAME, values, selection,
+        rowsUpdated = db.update(GoalContract.GoalEntry.TABLE_NAME, values, sUpdateSelection,
                 selectionArgs);
 
 
