@@ -1,5 +1,9 @@
 package com.seantholcomb.goalgetter;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -10,6 +14,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.Calendar;
 
 
 public class DashBoardActivity extends AppCompatActivity
@@ -31,6 +37,9 @@ public class DashBoardActivity extends AppCompatActivity
     private final String TITLE_KEY= "title";
     private final String DUE_DATE_KEY = "due_date";
 
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +54,21 @@ public class DashBoardActivity extends AppCompatActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        //Set Alarm for database incrementation and notifications
+        alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, GoalAlarm.class);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        // Set the alarm to start at midnight
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+
+        // set the alarm to repeat daily but not to go off until the device is woken up
+        alarmMgr.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
+
     }
 
     @Override
@@ -172,4 +196,7 @@ public class DashBoardActivity extends AppCompatActivity
             mNavigationDrawerFragment.openDrawer();
         }
     }
+
 }
+
+
