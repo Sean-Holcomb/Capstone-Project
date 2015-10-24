@@ -199,7 +199,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
                     mCVArrayList.get(position),
                     sUpdateSelection,
                     new String[] {selectionArgs});
-            Log.e("EEEE", updated + "");
             todoAdapterViewHolder.mBox.setChecked(false);
         } else if (difDays < 0) {
 
