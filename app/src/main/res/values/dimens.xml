@@ -7,4 +7,10 @@
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
     <dimen name="graph_padding">4dp</dimen>
+
+    <!--Widget Dimens-->
+    <dimen name="widget_todo_default_width">180dp</dimen>
+    <dimen name="widget_todo_default_height">110dp</dimen>
+    <dimen name="widget_todo_min_resize_width">180dp</dimen>
+    <dimen name="widget_todo_min_resize_height">@dimen/widget_todo_default_height</dimen>
 </resources>

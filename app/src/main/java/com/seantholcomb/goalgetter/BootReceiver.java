@@ -33,4 +33,14 @@ public class BootReceiver extends BroadcastReceiver{
                     AlarmManager.INTERVAL_DAY, alarmIntent);
         }
     }
+
+    public class NotifyAlarm extends BroadcastReceiver {
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            GoalAlarm goalAlarm = new GoalAlarm();
+            goalAlarm.onHandleIntent(intent);
+        }
+    }
 }

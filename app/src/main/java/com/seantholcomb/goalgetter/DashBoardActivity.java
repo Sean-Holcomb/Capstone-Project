@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -68,11 +69,14 @@ public class DashBoardActivity extends AppCompatActivity
         // Set the alarm to start at midnight
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        //calendar.set(Calendar.HOUR_OF_DAY, 0);
 
         // set the alarm to repeat daily but not to go off until the device is woken up
-        alarmMgr.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, alarmIntent);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(),
+                //AlarmManager.INTERVAL_DAY
+                1000*60, alarmIntent);
+        Log.e("JJJ", "Alarm set");
 
     }
 

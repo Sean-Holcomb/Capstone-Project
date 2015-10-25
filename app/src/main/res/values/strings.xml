@@ -56,5 +56,8 @@
     <string name="completed"> is completed</string>
     <string name="task_due">Task Due Today</string>
 
+    <!--Widget Strings-->
+    <string name="widget_title">Todo Widget</string>
+
 
 </resources>

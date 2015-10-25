@@ -26,11 +26,35 @@
             android:syncable="true" />
 
         <receiver android:name=".BootReceiver"
-            android:enabled="false">
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".BootReceiver.NotifyAlarm"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.NOTIFY" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Collection Widget-->
+        <receiver
+            android:name=".widget.TodoWidgetProvider"
+            android:label="@string/widget_title">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info_todo" />
+        </receiver>
+        <service
+            android:name=".widget.TodoWidgetRemoteViewsService"
+
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

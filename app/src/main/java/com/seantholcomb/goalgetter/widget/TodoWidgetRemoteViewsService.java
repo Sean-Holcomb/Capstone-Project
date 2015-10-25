@@ -6,17 +6,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.text.format.Time;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.seantholcomb.goalgetter.R;
 import com.seantholcomb.goalgetter.data.GoalContract;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by seanholcomb on 10/24/15.
@@ -80,16 +75,16 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                     final long identityToken = Binder.clearCallingIdentity();
                     // Get today's data from the ContentProvider
 
-                    Uri TodoUri = DatabaseContract.scores_table.buildScoreWithDate();
+                    Uri TodoUri = GoalContract.GoalEntry.TODO_URI;
                     data = getContentResolver().query(
-                            TodayGameUri,
-                            DATABASE_COLUMNS,
-                            selection,
-                            dateStrings,
-                            DatabaseContract.scores_table.DATE_COL + " ASC");
+                            TodoUri,
+                            Goal_COLUMNS,
+                            null,
+                            null,
+                            sortOrder);
                     if (data!=null) {
-                        String ee = data.getCount()+" ";
-                        Log.e("EEEEEEEEE", ee);
+
+
                     }
                     Binder.restoreCallingIdentity(identityToken);
                 }
@@ -116,23 +111,8 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                         return views;
                     }
 
-                    int gameId = data.getInt(INDEX_MATCH_ID);
-                    String homeName = data.getString(INDEX_HOME);
-                    String awayName = data.getString(INDEX_AWAY);
-                    int homeCrest = Utilies.getTeamCrestByTeamName(homeName, getApplicationContext());
-                    int awayCrest = Utilies.getTeamCrestByTeamName(awayName, getApplicationContext());
-                    String score = Utilies.getScores(data.getInt(INDEX_HOME_GOALS), data.getInt(INDEX_AWAY_GOALS));
-                    String date = data.getString(INDEX_MATCHTIME);
-                    String day = data.getString(INDEX_DATE);
-                    day = getDayName(day);
+                    views.setTextViewText(R.id.todo_title, data.getString(COL_TASK));
 
-                    views.setTextViewText(R.id.day_text, day);
-                    views.setTextViewText(R.id.home_name, homeName);
-                    views.setTextViewText(R.id.away_name, awayName);
-                    views.setTextViewText(R.id.score_textview, score);
-                    views.setTextViewText(R.id.data_textview, date);
-                    views.setImageViewResource(R.id.home_crest, homeCrest);
-                    views.setImageViewResource(R.id.away_crest, awayCrest);
 
                     return views;
                 }
@@ -150,7 +130,7 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                 @Override
                 public long getItemId(int position) {
                     if (data.moveToPosition(position))
-                        return data.getLong(INDEX_MATCH_ID);
+                        return data.getLong(COL_ID);
                     return position;
                 }
 
