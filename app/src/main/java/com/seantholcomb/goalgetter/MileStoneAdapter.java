@@ -137,6 +137,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 } else {
                     mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
                 }
+                Log.e("EEE", mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_STATUS));
             }
         });
 
@@ -267,7 +268,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     public void makeValue(Cursor cursor) {
         mCVArrayList.clear();
-        ContentValues contentValues = new ContentValues();
         if(cursor != null)
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
@@ -276,6 +276,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 mID= cursor.getString(DashboardFragment.COL_GOAL_ID);
                 continue;
             }
+            ContentValues contentValues = new ContentValues();
             contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
             contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
             contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
@@ -333,20 +334,27 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void updateTasks(ContentValues contentValues) {
+        Log.e("EEE", "updating");
         int done = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
         double start = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE);
         double end = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         int freq = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_FREQUENCY);
         if (freq == 0) {
+            Log.e("EEE", "zero freq");
             contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, done + missed);
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 0);
         } else {
 
-            double dif = start - end;
+            double dif = end - start;
+
             dif = dif / (1000 * 60 * 60 * 24);
+            Log.e("EEE", "save dif =" + dif + "(should be whole number or just over whole)");
+            dif = dif / 7 * freq;
             int difDays = (int) dif;
-            difDays = difDays / freq;
+            Log.e("EEE", "save difdays =" + difDays);
+
+
             contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, difDays);
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, difDays - done - missed);
 
@@ -355,33 +363,46 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void arrangeForSave(){
+        Log.e("EEEE","arraging");
         ContentValues contentValues1;
         ContentValues contentValues2;
+        for (int i = 0; i < mCVArrayList.size(); i++){
+            Log.e("EEE", mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
+        }
         for (int i = 0; i < mCVArrayList.size(); i++){
             for (int j = i+1; j<mCVArrayList.size(); j++){
                 contentValues1=mCVArrayList.get(i);
                 contentValues2=mCVArrayList.get(j);
-                if(contentValues1.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)<
+                if(contentValues1.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)>
                         contentValues2.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)) {
                     mCVArrayList.remove(j);
                     mCVArrayList.add(i, contentValues2);
                 }
             }
         }
+        for (int i = 0; i < mCVArrayList.size(); i++){
+            Log.e("EEE", mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
+        }
         Calendar calendar = Calendar.getInstance();
         if (mCVArrayList.size()!=0) {
-            if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
+            if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)
+                    || mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)
+                    > (double) GoalContract.normalizeDate(calendar.getTimeInMillis())) {
                 mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.ACTIVE);
+            }else{
+                mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
             }
             if (mCVArrayList.get(0).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE) == 0) {
                 mCVArrayList.get(0).put(GoalContract.GoalEntry.COLUMN_START_DATE, (double) GoalContract.normalizeDate(calendar.getTimeInMillis()));
-                updateTasks(mCVArrayList.get(0));
             }
+            updateTasks(mCVArrayList.get(0));
         }
         for (int i = 1; i < mCVArrayList.size(); i++){
-            if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)
+            if (mCVArrayList.get(i).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE)
                     < (double) GoalContract.normalizeDate(calendar.getTimeInMillis())){
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
+            }else if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)){
+                mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
             }
 
             if (mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)){

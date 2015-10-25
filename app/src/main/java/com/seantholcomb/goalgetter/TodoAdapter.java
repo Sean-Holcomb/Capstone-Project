@@ -84,13 +84,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
         String title = mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
         todoAdapterViewHolder.mTitleView.setText(title);
         todoAdapterViewHolder.mBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            //todo fix problem with check box
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     int plus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) + 1;
                     int minus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) - 1;
                     mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, plus);
-                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, minus);
+                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, minus);
                     Log.e("EEE", "changed");
                 } else {
                     int minus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) - 1;
@@ -138,9 +139,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
 
     public void makeValue(Cursor cursor) {
         mCVArrayList.clear();
-        ContentValues contentValues = new ContentValues();
+
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
+            ContentValues contentValues = new ContentValues();
             contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
             contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
             contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
@@ -173,21 +175,28 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
     }
 
     public void checkOnTrack(TodoAdapterViewHolder todoAdapterViewHolder, int position) {
+        Log.e("EEE", "checking");
         int done = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
         int remaining = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING);
         double start = (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis());
-
+        Log.e("EEE", "done " + done);
+        Log.e("EEE", "missed" + missed);
+        Log.e("EEE", "remaining " + remaining);
+        Log.e("EEE", "checking");
         double end = mCVArrayList.get(position).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         int freq = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_FREQUENCY);
 
 
         int total = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS);
-        double dif = start - end;
+        Log.e("EEE", "total  " + total);
+        double dif = end - start;
         dif = dif / (1000 * 60 * 60 * 24);
+        dif = dif / 7 * freq;
         int difDays = (int) dif;
-        difDays = difDays / freq;
+        Log.e("EEE", "remaining difdays  " + difDays);
         difDays = total - done - missed - difDays;
+        Log.e("EEE", "value difdays  " + difDays);
         if (difDays > 0) {
             missed += difDays;
             remaining -= difDays;

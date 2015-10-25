@@ -13,6 +13,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
+import com.seantholcomb.goalgetter.data.GoalProvider;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,6 +66,7 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
     private ArrayList<ContentValues> mCVArrayList;
     private ArrayList<String> mIdArrayList;
     private final int NOTIFICATION_ID = 9087;
+    //Todo add option to turn off notifications and implement here
     private boolean notificationsEnabled = true;
 
     public GoalAlarm() {
@@ -84,8 +86,8 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
         makeValue(data);
         deleteStrayMilestones();
-        updateTasks();
         sendNotification(this);
+        updateTasks();
 
 
     }
@@ -176,6 +178,10 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
             }
         }
+
+        ContentValues[] CVArray = mCVArrayList.toArray(new ContentValues[mCVArrayList.size()]);
+        this.getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, GoalProvider.DELETE_ALL, null);
+        this.getContentResolver().bulkInsert(GoalContract.GoalEntry.GOAL_URI, CVArray);
     }
 
     //This method will delete milestones that are not associated with a Goal
@@ -190,8 +196,7 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
                     }
                 }
                 if (isStray) {
-                    String[] selectionArgs = new String[]{mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_ID)};
-                    this.getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, selectionArgs);
+
                     mCVArrayList.remove(i);
                 }
             }
@@ -210,10 +215,10 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
         if (freq == 0) return false;
 
         int total = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS);
-        double dif = start - end;
+        double dif = end-start;
         dif = dif / (1000 * 60 * 60 * 24);
+        dif = dif / 7 * freq;
         int difDays = (int) dif;
-        difDays = difDays / freq;
         difDays = total - done - missed - difDays;
         if (difDays > 0) {
             missed += difDays;
@@ -236,13 +241,14 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
     public void makeValue(Cursor cursor) {
         mIdArrayList.clear();
         mCVArrayList.clear();
-        ContentValues contentValues = new ContentValues();
+
         if (cursor != null)
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 if (cursor.getString(COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
                     mIdArrayList.add(cursor.getString(COL_GOAL_ID));
                 }
+                ContentValues contentValues = new ContentValues();
                 contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(COL_GOAL_ID));
                 contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(COL_TYPE));
                 contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(COL_NAME));

@@ -17,7 +17,7 @@ public class GoalProvider extends ContentProvider {
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private GoalDbHelper mOpenHelper;
-
+    public static final String DELETE_ALL="delete";
     static final int GOAL = 99;
     static final int PAST = 100;
     static final int GOAL_WITH_MILESTONES = 101;
@@ -265,6 +265,7 @@ public class GoalProvider extends ContentProvider {
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
+        if (selection.equals(DELETE_ALL)) selection = null;
         switch (match) {
             case GOAL:
                 rowsDeleted = db.delete(

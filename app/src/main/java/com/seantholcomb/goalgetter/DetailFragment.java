@@ -64,7 +64,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_TOTAL_TASKS = 8;
     static final int COL_DONE_TASK = 9;
     static final int COL_MISSED_TASKS = 10;
-    static final int COL_REMAINING = 11;
+    static final int COL_REMAINING_TASKS = 11;
     static final int COL_STATUS = 12;
 
     private GoalAdapter mGoalAdapter;
@@ -289,19 +289,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void getGoal(Cursor cursor){
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
-            if (cursor.getString(DashboardFragment.COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(DashboardFragment.COL_TYPE));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(DashboardFragment.COL_NAME));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_START_DATE, cursor.getDouble(DashboardFragment.COL_START_DATE));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, cursor.getDouble(DashboardFragment.COL_DUE_DATE));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASK, cursor.getString(DashboardFragment.COL_TASK));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, cursor.getInt(DashboardFragment.COL_FREQUENCY));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, cursor.getInt(DashboardFragment.COL_TOTAL_TASKS));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, cursor.getInt(DashboardFragment.COL_DONE_TASK));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, cursor.getInt(DashboardFragment.COL_MISSED_TASKS));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, cursor.getInt(DashboardFragment.COL_REMAINING_TASKS));
-                GoalValue.put(GoalContract.GoalEntry.COLUMN_STATUS, cursor.getString(DashboardFragment.COL_STATUS));
+            if (cursor.getString(COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(COL_GOAL_ID));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TYPE, cursor.getString(COL_TYPE));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_NAME, cursor.getString(COL_NAME));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_START_DATE, cursor.getDouble(COL_START_DATE));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, cursor.getDouble(COL_DUE_DATE));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASK, cursor.getString(COL_TASK));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, cursor.getInt(COL_FREQUENCY));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, cursor.getInt(COL_TOTAL_TASKS));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, cursor.getInt(COL_DONE_TASK));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, cursor.getInt(COL_MISSED_TASKS));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, cursor.getInt(COL_REMAINING_TASKS));
+                GoalValue.put(GoalContract.GoalEntry.COLUMN_STATUS, cursor.getString(COL_STATUS));
                 return;
             }
         }

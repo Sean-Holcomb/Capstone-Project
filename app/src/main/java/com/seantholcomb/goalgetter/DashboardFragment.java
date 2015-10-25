@@ -15,7 +15,8 @@ import android.view.ViewGroup;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
 
-
+//Todo calendar picker closes keyboard
+//Todo calendar view opens with last due date
 public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 

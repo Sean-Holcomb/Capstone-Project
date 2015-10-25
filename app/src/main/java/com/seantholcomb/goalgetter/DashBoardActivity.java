@@ -17,12 +17,17 @@ import android.view.MenuItem;
 
 import java.util.Calendar;
 
-
+//todo add widget
+//todo add about texts
+//todo add focus timer
+//todo add admob
+//todo add calanedar function
+//todo add setting
+//todo clean up code
+//todo make ui nicer
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         DashboardFragment.Callback, DetailFragment.Callback {
-    //TODO write method to update Goal tasks
-    //TODo write method to clean up stray milestones
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
