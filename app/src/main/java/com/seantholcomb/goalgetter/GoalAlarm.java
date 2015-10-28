@@ -66,9 +66,11 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
     private CursorLoader mCursorLoader;
     private ArrayList<ContentValues> mCVArrayList;
     private ArrayList<String> mIdArrayList;
-    private final int NOTIFICATION_ID = 9087;
+
     //Todo add option to turn off notifications and implement here
     private boolean notificationsEnabled = true;
+    private final String GROUP_TODO = "group_todo";
+    private final String GROUP_COMPLETE = "group_complete";
 
     public GoalAlarm() {
         super("GoalAlarm");
@@ -76,26 +78,31 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     @Override
     public void onHandleIntent(Intent intent) {
+        Log.e("JJJ", "Intented");
         mCVArrayList = new ArrayList<>();
         mIdArrayList = new ArrayList<>();
         mCursorLoader = new CursorLoader(this, GoalContract.GoalEntry.GOAL_URI, Goal_COLUMNS, null, null, sortOrder);
+        Log.e("JJJ", "Loader Started");
         mCursorLoader.registerListener(0, this);
+        Log.e("JJJ", "Listener set");
         mCursorLoader.startLoading();
-        Log.e("JJJ", "Alarm set");
+        Log.e("JJJ", "Loader Started");
+
     }
 
     @Override
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
+        Log.e("JJJ", "Data Loaded");
         makeValue(data);
         deleteStrayMilestones();
-        sendNotification(this);
+        sendNotification();
         updateTasks();
-        Log.e("JJJ", "Data Loaded");
+
 
 
     }
 
-    private void sendNotification(Context context) {
+    private void sendNotification() {
 
         Log.e("JJJ", "Notifications sending");
         NotificationCompat.Builder mBuilder;
@@ -119,15 +126,18 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
             if (notificationsEnabled && mCVArrayList.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE) <= calendar.getTimeInMillis()
                     && !mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
-
+                int id = (int) mCVArrayList.get(i).get(GoalContract.GoalEntry._ID);
                 String name = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
                 mBuilder =
                         new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.ic_drawer)
                                 .setContentTitle(getString(R.string.congratulations))
                                 .setContentText(name + getString(R.string.completed))
+                                .setGroup(GROUP_COMPLETE)
+                                .setAutoCancel(true)
                                 .setContentIntent(resultPendingIntent);
-                mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+                mNotificationManager.notify(id, mBuilder.build());
 
 
             }
@@ -135,14 +145,17 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
                     && mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TYPE).equals(GoalContract.GoalEntry.MILESTONE)) {
                 showNotification = checkOnTrack(i);
                 if (notificationsEnabled && showNotification) {
+                    int id = mCVArrayList.get(i).getAsInteger(GoalContract.GoalEntry._ID);
                     String task = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
                     mBuilder =
                             new NotificationCompat.Builder(this)
                                     .setSmallIcon(R.drawable.ic_drawer)
                                     .setContentTitle(getString(R.string.task_due))
                                     .setContentText(task)
+                                    .setGroup(GROUP_TODO)
+                                    .setAutoCancel(true)
                                     .setContentIntent(resultPendingIntent);
-                    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+                    mNotificationManager.notify(id, mBuilder.build());
                 }
             }
         }

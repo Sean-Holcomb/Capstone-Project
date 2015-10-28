@@ -50,6 +50,7 @@
     <string name="set_alarm">Set Alarm</string>
     <string name="zero">0</string>
     <string name="zero_timer">0:00:00</string>
+    <string name="timer_toast">Try to pick a shorter time</string>
     
     <!--Notification Strings-->
     <string name="congratulations">Congratulations!</string>

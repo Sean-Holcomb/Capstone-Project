@@ -28,16 +28,18 @@
         <receiver android:name=".BootReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".BootReceiver.NotifyAlarm"
+        <receiver android:name=".AlarmReceiver"
             android:exported="true" >
             <intent-filter>
-                <action android:name="android.intent.action.NOTIFY" />
+                <action android:name="android.intent.action.AlarmReceiver" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".GoalAlarm"/>
 
         <!-- Collection Widget-->
         <receiver

@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +99,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
         milestoneAdapterViewHolder.due_date = mCVArrayList.get(position).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         milestoneAdapterViewHolder.dueDateView.setText(Utility.getDate((long) milestoneAdapterViewHolder.due_date));
-        Log.e("EEE", mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_NAME));
         milestoneAdapterViewHolder.titleView.setText(mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_NAME));
         milestoneAdapterViewHolder.frequencyView.setText(String.valueOf(mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_FREQUENCY)));
         milestoneAdapterViewHolder.taskView.setText(mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
@@ -137,7 +135,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 } else {
                     mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.PENDING);
                 }
-                Log.e("EEE", mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_STATUS));
             }
         });
 
@@ -334,14 +331,12 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void updateTasks(ContentValues contentValues) {
-        Log.e("EEE", "updating");
         int done = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
         double start = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE);
         double end = contentValues.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         int freq = (int) contentValues.get(GoalContract.GoalEntry.COLUMN_FREQUENCY);
         if (freq == 0) {
-            Log.e("EEE", "zero freq");
             contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, done + missed);
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 0);
         } else {
@@ -349,10 +344,9 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             double dif = end - start;
 
             dif = dif / (1000 * 60 * 60 * 24);
-            Log.e("EEE", "save dif =" + dif + "(should be whole number or just over whole)");
             dif = dif / 7 * freq;
             int difDays = (int) dif;
-            Log.e("EEE", "save difdays =" + difDays);
+
 
 
             contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, difDays);
@@ -363,12 +357,9 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void arrangeForSave(){
-        Log.e("EEEE","arraging");
         ContentValues contentValues1;
         ContentValues contentValues2;
-        for (int i = 0; i < mCVArrayList.size(); i++){
-            Log.e("EEE", mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
-        }
+
         for (int i = 0; i < mCVArrayList.size(); i++){
             for (int j = i+1; j<mCVArrayList.size(); j++){
                 contentValues1=mCVArrayList.get(i);
@@ -380,9 +371,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
                 }
             }
         }
-        for (int i = 0; i < mCVArrayList.size(); i++){
-            Log.e("EEE", mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK));
-        }
+
         Calendar calendar = Calendar.getInstance();
         if (mCVArrayList.size()!=0) {
             if (!mCVArrayList.get(0).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)
@@ -450,7 +439,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
     public void swapCursor(Cursor newCursor) {
-        Log.e("EEE", "swap");
         mCursor = newCursor;
         makeValue(mCursor);
         notifyDataSetChanged();

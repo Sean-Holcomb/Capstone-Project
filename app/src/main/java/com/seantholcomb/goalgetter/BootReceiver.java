@@ -20,7 +20,7 @@ public class BootReceiver extends BroadcastReceiver{
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             //Set Alarm for database incrementation and notifications
             alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-            Intent pendIntent = new Intent(context, GoalAlarm.class);
+            Intent pendIntent = new Intent(context, AlarmReceiver.class);
             alarmIntent = PendingIntent.getBroadcast(context, 0, pendIntent, 0);
 
             // Set the alarm to start at midnight
@@ -34,13 +34,5 @@ public class BootReceiver extends BroadcastReceiver{
         }
     }
 
-    public class NotifyAlarm extends BroadcastReceiver {
 
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            GoalAlarm goalAlarm = new GoalAlarm();
-            goalAlarm.onHandleIntent(intent);
-        }
-    }
 }

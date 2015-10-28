@@ -18,7 +18,6 @@ import android.view.MenuItem;
 
 import java.util.Calendar;
 
-//todo add widget
 //todo add about texts
 //todo add focus timer
 //todo add admob
@@ -63,19 +62,19 @@ public class DashBoardActivity extends AppCompatActivity
 
         //Set Alarm for database incrementation and notifications
         alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, GoalAlarm.class);
+        Intent intent = new Intent(this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         // Set the alarm to start at midnight
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        //calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
 
         // set the alarm to repeat daily but not to go off until the device is woken up
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(),
-                //AlarmManager.INTERVAL_DAY
-                1000*60, alarmIntent);
+                AlarmManager.INTERVAL_DAY,
+                alarmIntent);
         Log.e("JJJ", "Alarm set");
 
     }
