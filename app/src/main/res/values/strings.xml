@@ -51,6 +51,8 @@
     <string name="zero">0</string>
     <string name="zero_timer">0:00:00</string>
     <string name="timer_toast">Try to pick a shorter time</string>
+    <string name="minutes_toast">Please enter a number of minutes</string>
+    <string name="start_toast">Timer Started, Stay Focused</string>
     
     <!--Notification Strings-->
     <string name="congratulations">Congratulations!</string>
