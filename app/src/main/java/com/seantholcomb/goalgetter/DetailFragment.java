@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -102,7 +103,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private final String DATE_KEY = "due_date";
     private String titleString;
     private String dateString;
-    private Boolean isNew;
+    private boolean isNew;
+    //todo add checkbox for adding to calendar
+    private boolean calendarEnabled= true;
 
     private GoogleAccountCredential mCredential;
 
@@ -180,22 +183,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isNew = false;
-                ArrayList<ContentValues> CVAL = mMilestoneAdapter.save();
-                Log.e("EEEEEEE", titleString);
-                getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
-                titleString = GoalValue.getAsString(GoalContract.GoalEntry.COLUMN_ID);
-                double date = GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
-                dateString = Utility.getDate((long) date);
+                ArrayList<ContentValues> CVAL = mMilestoneAdapter.arrangeForSave();
                 setGoalTasks(CVAL);
                 CVAL.add(0, GoalValue);
-                addEvents(CVAL);
-                ContentValues[] CVArray = CVAL.toArray(new ContentValues[CVAL.size()]);
-                getContext().getContentResolver().bulkInsert(GoalContract.GoalEntry.GOAL_URI, CVArray);
-                Bundle args = new Bundle();
-                args.putString(TITLE_KEY, titleString);
-                args.putDouble(DATE_KEY, date);
-                ((Callback) getActivity()).onSave(args);
+                if (calendarEnabled) {
+                    addEvents(CVAL);
+                }else{
+                    onSaveButton(CVAL);
+                }
+
             }
         });
 
@@ -269,6 +265,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMilestoneList.setAdapter(mMilestoneAdapter);
         setEditable(isNew);
         return rootView;
+    }
+
+    public void onSaveButton(ArrayList<ContentValues> CVAL){
+        isNew = false;
+        getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
+        titleString = GoalValue.getAsString(GoalContract.GoalEntry.COLUMN_ID);
+        double date = GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
+        dateString = Utility.getDate((long) date);
+        ContentValues[] CVArray = CVAL.toArray(new ContentValues[CVAL.size()]);
+        getContext().getContentResolver().bulkInsert(GoalContract.GoalEntry.GOAL_URI, CVArray);
+        Bundle args = new Bundle();
+        args.putString(TITLE_KEY, titleString);
+        args.putDouble(DATE_KEY, date);
+        ((Callback) getActivity()).onSave(args);
     }
 
     public void setEditable(Boolean editable) {
@@ -409,29 +419,29 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void addEvents(ArrayList<ContentValues> CVAL){
-        String baseId = "goalGetterEvent";
+        String baseId = "goalgetterevent";
         ArrayList<Event> events = new ArrayList<>();
 
         for (int i = 0; i<CVAL.size();i++) {
             String summary = CVAL.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
             long dueDate = CVAL.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE);
-            String id = baseId + CVAL.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
-            Log.e("FFF", id);
+
+
             DateTime dateTime = new DateTime(new Date(dueDate));
             EventDateTime start = new EventDateTime();
-            DateTime endTime = new DateTime(new Date(dueDate+1));
+            DateTime endTime = new DateTime(new Date(dueDate+24*60*60*1000));
             EventDateTime end = new EventDateTime();
-            end.setDate(endTime);
-            start.setDate(dateTime);
+            end.setDateTime(endTime);
+            start.setDateTime(dateTime);
 
             Event event = new Event()
                     .setSummary(summary)
                     .setStart(start)
-                    .setEnd(end)
-                    .setId(id);
+                    .setEnd(end);
+
             events.add(event);
         }
-        MakeRequestTask task = new MakeRequestTask(mCredential, events);
+        MakeRequestTask task = new MakeRequestTask(mCredential, events, CVAL);
         task.execute();
 
     }
@@ -516,15 +526,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-    private class MakeRequestTask extends AsyncTask<Void, Void, Void> {
+    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
         private ArrayList<Event> mEvents =null;
         private Exception mLastError = null;
+        private ArrayList<ContentValues> mCVAL;
+        private String mId;
 
-        public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events) {
+        public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events, ArrayList<ContentValues> CVAL) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mEvents=events;
+            mCVAL= CVAL;
+            mId= CVAL.get(0).getAsString(GoalContract.GoalEntry.COLUMN_ID);
             mService = new com.google.api.services.calendar.Calendar.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Goal Getter")
@@ -537,10 +551,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
          * @param params no parameters needed for this task.
          */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected List<String> doInBackground(Void... params) {
             try {
+                //com.google.api.services.calendar.model.Calendar calendar = mService.calendars().get(titleString).execute();
+                //if (calendar != null){
+                //    calendar.clear();
+                //    calendar.setId(mId);
+                //    calendar.setSummary(mId);
+                //    calendar.
+                //}
                 for (Event event : mEvents) {
                     mService.events().insert("primary", event).execute();
+
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -552,13 +574,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         @Override
+        protected void onPostExecute(List<String> output) {
+            onSaveButton(mCVAL);
+        }
+
+        @Override
         protected void onCancelled() {
 
             if (mLastError != null) {
                 if (mLastError instanceof UserRecoverableAuthIOException) {
-                    getActivity().startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            REQUEST_AUTHORIZATION);
+                        startActivityForResult(
+                                ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                                REQUEST_AUTHORIZATION);
+
                 }
             }
         }

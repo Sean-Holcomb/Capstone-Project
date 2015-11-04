@@ -314,12 +314,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         }
     }
 
-
-    public ArrayList<ContentValues> save() {
-        arrangeForSave();
-        return mCVArrayList;
-    }
-
     public void cancel() {
         makeValue(mCursor);
         notifyDataSetChanged();
@@ -356,7 +350,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
     }
 
-    public void arrangeForSave(){
+    public ArrayList<ContentValues> arrangeForSave(){
         ContentValues contentValues1;
         ContentValues contentValues2;
 
@@ -424,6 +418,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             updateTasks(mCVArrayList.get(i));
 
         }
+        return mCVArrayList;
     }
 
 
