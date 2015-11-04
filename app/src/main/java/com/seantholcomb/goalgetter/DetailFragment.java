@@ -1,10 +1,15 @@
 package com.seantholcomb.goalgetter;
 
+import android.accounts.AccountManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,10 +29,23 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.seantholcomb.goalgetter.data.GoalContract;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -67,6 +85,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_REMAINING_TASKS = 11;
     static final int COL_STATUS = 12;
 
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+
     private GoalAdapter mGoalAdapter;
     private MilestoneAdapter mMilestoneAdapter;
     private RecyclerView mMilestoneGraph;
@@ -82,6 +103,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String titleString;
     private String dateString;
     private Boolean isNew;
+
+    private GoogleAccountCredential mCredential;
+
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
 
     public DetailFragment() {
         // Required empty public constructor
@@ -123,6 +149,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         cancelButton = (Button) rootView.findViewById(R.id.cancel_button);
         mMilestoneList = (RecyclerView) rootView.findViewById(R.id.milestone_list);
         mMilestoneGraph = (RecyclerView) rootView.findViewById(R.id.milestone_graph);
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff())
+                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+
+
+        if (!settings.contains(PREF_ACCOUNT_NAME)){
+            chooseAccount();
+        }
 
         titleView.setText(titleString);
         duedateView.setText(dateString);
@@ -153,6 +189,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 dateString = Utility.getDate((long) date);
                 setGoalTasks(CVAL);
                 CVAL.add(0, GoalValue);
+                addEvents(CVAL);
                 ContentValues[] CVArray = CVAL.toArray(new ContentValues[CVAL.size()]);
                 getContext().getContentResolver().bulkInsert(GoalContract.GoalEntry.GOAL_URI, CVArray);
                 Bundle args = new Bundle();
@@ -341,6 +378,64 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, remaining);
     }
 
+    private void chooseAccount() {
+        startActivityForResult(
+                mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
+
+    @Override
+    public void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        mCredential.setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+                        editor.apply();
+                    }
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void addEvents(ArrayList<ContentValues> CVAL){
+        String baseId = "goalGetterEvent";
+        ArrayList<Event> events = new ArrayList<>();
+
+        for (int i = 0; i<CVAL.size();i++) {
+            String summary = CVAL.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
+            long dueDate = CVAL.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE);
+            String id = baseId + CVAL.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
+            Log.e("FFF", id);
+            DateTime dateTime = new DateTime(new Date(dueDate));
+            EventDateTime start = new EventDateTime();
+            DateTime endTime = new DateTime(new Date(dueDate+1));
+            EventDateTime end = new EventDateTime();
+            end.setDate(endTime);
+            start.setDate(dateTime);
+
+            Event event = new Event()
+                    .setSummary(summary)
+                    .setStart(start)
+                    .setEnd(end)
+                    .setId(id);
+            events.add(event);
+        }
+        MakeRequestTask task = new MakeRequestTask(mCredential, events);
+        task.execute();
+
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
@@ -419,6 +514,55 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
 
         }
+    }
+
+    private class MakeRequestTask extends AsyncTask<Void, Void, Void> {
+        private com.google.api.services.calendar.Calendar mService = null;
+        private ArrayList<Event> mEvents =null;
+        private Exception mLastError = null;
+
+        public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mEvents=events;
+            mService = new com.google.api.services.calendar.Calendar.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Goal Getter")
+                    .build();
+        }
+
+        /**
+         * Background task to call Google Calendar API.
+         *
+         * @param params no parameters needed for this task.
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                for (Event event : mEvents) {
+                    mService.events().insert("primary", event).execute();
+                }
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                Log.e("FFF", e.toString());
+                return null;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+
+            if (mLastError != null) {
+                if (mLastError instanceof UserRecoverableAuthIOException) {
+                    getActivity().startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            REQUEST_AUTHORIZATION);
+                }
+            }
+        }
+
     }
 
 

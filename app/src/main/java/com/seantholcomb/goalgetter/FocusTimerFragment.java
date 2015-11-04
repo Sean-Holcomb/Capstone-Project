@@ -29,6 +29,7 @@ public class FocusTimerFragment extends Fragment {
     private Button stopButton;
     private Spinner alarmPicker;
     private TextView minuteOutput;
+    private long[] vibratePatern = {500, 3000, 500, 3000};
 
     private final int MINS_TO_MILLIS= 60000;
     private int mMinutes = 0;
@@ -126,8 +127,7 @@ public class FocusTimerFragment extends Fragment {
                             mTimerCount = mMillis;
                             displayTime();
                             mRingtone.play();
-                            //todo fix vibrator
-                            vibrator.vibrate( new long[] {500, 3000}, 5);
+                            vibrator.vibrate(vibratePatern, 3);
                         }
                     };
                     countDownTimer.start();

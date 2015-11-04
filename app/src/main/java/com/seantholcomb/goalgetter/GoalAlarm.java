@@ -11,7 +11,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
 import com.seantholcomb.goalgetter.data.GoalProvider;
@@ -78,21 +77,16 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     @Override
     public void onHandleIntent(Intent intent) {
-        Log.e("JJJ", "Intented");
         mCVArrayList = new ArrayList<>();
         mIdArrayList = new ArrayList<>();
         mCursorLoader = new CursorLoader(this, GoalContract.GoalEntry.GOAL_URI, Goal_COLUMNS, null, null, sortOrder);
-        Log.e("JJJ", "Loader Started");
         mCursorLoader.registerListener(0, this);
-        Log.e("JJJ", "Listener set");
         mCursorLoader.startLoading();
-        Log.e("JJJ", "Loader Started");
 
     }
 
     @Override
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-        Log.e("JJJ", "Data Loaded");
         makeValue(data);
         deleteStrayMilestones();
         sendNotification();
@@ -102,9 +96,9 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     }
 
+
     private void sendNotification() {
 
-        Log.e("JJJ", "Notifications sending");
         NotificationCompat.Builder mBuilder;
         Intent resultIntent = new Intent(this, DashBoardActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);

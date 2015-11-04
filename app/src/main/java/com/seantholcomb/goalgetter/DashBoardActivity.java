@@ -1,8 +1,10 @@
 package com.seantholcomb.goalgetter;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,16 +13,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+
 import java.util.Calendar;
 
-//todo add about texts
-//todo add focus timer
-//todo add admob
+
 //todo add calanedar function
 //todo add setting
 //todo clean up code
@@ -44,6 +50,7 @@ public class DashBoardActivity extends AppCompatActivity
 
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
+    private InterstitialAd mInterstitialAd;
 
 
     @Override
@@ -76,34 +83,69 @@ public class DashBoardActivity extends AppCompatActivity
                 AlarmManager.INTERVAL_DAY,
                 alarmIntent);
         Log.e("JJJ", "Alarm set");
+        //todo banner ad should go behind keyboard
+        //todo fix interstitial ad
+        //todo make banner ads not block content
+        //admob ad setup
+        //mInterstitialAd = new InterstitialAd(this);
+        //mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+/*
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                mfragment  = new FocusTimerFragment();
+                mTitle = getString(R.string.title_section3);
+                menuLayout = R.menu.focus_timer;
 
+            }
+        });
+
+        //requestNewInterstitial();
+*/
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
+
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment;
+
         switch (position){
             case 1:
                 mTitle = getString(R.string.title_section2);
                 menuLayout = R.menu.detail;
-                fragment = new DetailFragment();
+                mfragment = new DetailFragment();
                 break;
             case 2:
-                fragment  = new FocusTimerFragment();
+                mfragment  = new FocusTimerFragment();
                 mTitle = getString(R.string.title_section3);
                 menuLayout = R.menu.focus_timer;
-
+                //if (mInterstitialAd.isLoaded()) {
+                //    mInterstitialAd.show();
+                //}
                 break;
             default:
                 mTitle = getString(R.string.title_section1);
                 menuLayout = R.menu.dash_board;
-                fragment= new DashboardFragment();
+                mfragment= new DashboardFragment();
         }
-        mfragment=fragment;
+
         fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
+                .replace(R.id.container, mfragment)
                 .commit();
     }
 
@@ -171,14 +213,46 @@ public class DashBoardActivity extends AppCompatActivity
 
         if (menuLayout == R.menu.focus_timer){
             if (id == R.id.action_about){
-                DialogFragment newFragment = new DialogFragment();
+                DialogFragment newFragment = new DialogFragment(){
+                    @Override
+                    public Dialog onCreateDialog (Bundle savedInstanceState){
+                        LayoutInflater inflater = getActivity().getLayoutInflater();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setView(inflater.inflate(R.layout.dialog_about_focus_timer, null));
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                //Nothing needed here
+                            }
+                        });
+
+                        return builder.create();
+                    }
+                };
+
                 newFragment.show(getSupportFragmentManager(), "aboutFocus");
             }
         }
 
         if (menuLayout == R.menu.detail){
             if (id == R.id.action_about_detail){
-                DialogFragment newFragment = new DialogFragment();
+                DialogFragment newFragment = new DialogFragment(){
+                    @Override
+                    public Dialog onCreateDialog (Bundle savedInstanceState){
+                        LayoutInflater inflater = getActivity().getLayoutInflater();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setView(inflater.inflate(R.layout.dialog_about_detail, null));
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                //Nothing needed here
+                            }
+                        });
+
+                        return builder.create();
+                    }
+                };
+
                 newFragment.show(getSupportFragmentManager(), "aboutDetail");
             }
             if (id == R.id.action_edit){
