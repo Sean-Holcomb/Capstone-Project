@@ -25,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -99,14 +101,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Button addMilestoneButton;
     private Button saveButton;
     private Button cancelButton;
+    private CheckBox addCalendar;
     private ContentValues GoalValue;
     private final String TITLE_KEY = "title";
     private final String DATE_KEY = "due_date";
     private String titleString;
     private String dateString;
     private boolean isNew;
-    //todo add checkbox for adding to calendar
-    private boolean calendarEnabled = true;
+    private boolean hasCalendar = false;
+    private boolean calendarActive = false;
 
     private GoogleAccountCredential mCredential;
 
@@ -125,6 +128,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff())
+                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
         if (args != null && args.containsKey(TITLE_KEY)) {
             isNew = false;
             titleString = args.getString(TITLE_KEY);
@@ -132,7 +140,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             dateString = Utility.getDate((long) dateDouble);
             GoalValue = newGoal();
             getLoaderManager().initLoader(0, args, this);
-
+            hasCalendar = settings.contains(Utility.makeValidId(titleString));
+            calendarActive = hasCalendar;
         } else {
             isNew = true;
             titleString = getString(R.string.title);
@@ -151,18 +160,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         addMilestoneButton = (Button) rootView.findViewById(R.id.add_button);
         saveButton = (Button) rootView.findViewById(R.id.save_button);
         cancelButton = (Button) rootView.findViewById(R.id.cancel_button);
+        addCalendar = (CheckBox) rootView.findViewById(R.id.add_calendar);
         mMilestoneList = (RecyclerView) rootView.findViewById(R.id.milestone_list);
         mMilestoneGraph = (RecyclerView) rootView.findViewById(R.id.milestone_graph);
-        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getActivity().getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
 
 
-        if (!settings.contains(PREF_ACCOUNT_NAME)) {
-            chooseAccount();
-        }
 
         titleView.setText(titleString);
         duedateView.setText(dateString);
@@ -181,15 +183,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mMilestoneAdapter.setmID(titleString);
             mMilestoneAdapter.setDueDate(Utility.getDateDouble(dateString));
         }
+        addCalendar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    if (!settings.contains(PREF_ACCOUNT_NAME)) {
+                        chooseAccount();
+                    }
+                }
+                calendarActive=isChecked;
+                Log.e("EEE", String.valueOf(calendarActive));
+            }
+        });
+        addCalendar.setChecked(calendarActive);
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ArrayList<ContentValues> CVAL = mMilestoneAdapter.arrangeForSave();
                 setGoalTasks(CVAL);
                 CVAL.add(0, GoalValue);
-                if (calendarEnabled) {
+                if (calendarActive) {
                     addEvents(CVAL);
-                } else {
+                } else if(hasCalendar){
+                    new MakeRequestTask(mCredential, CVAL).execute();
+                }else {
                     onSaveButton(CVAL);
                 }
 
@@ -285,6 +304,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             cancelButton.setVisibility(View.VISIBLE);
             saveButton.setVisibility(View.VISIBLE);
             addMilestoneButton.setVisibility(View.VISIBLE);
+            addCalendar.setVisibility(View.VISIBLE);
             if (!duedateView.hasOnClickListeners()) {
                 duedateView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -296,6 +316,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 });
             }
         } else {
+            addCalendar.setVisibility(View.GONE);
             cancelButton.setVisibility(View.GONE);
             saveButton.setVisibility(View.GONE);
             addMilestoneButton.setVisibility(View.GONE);
@@ -326,6 +347,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void deleteGoal() {
+        if (hasCalendar){
+           new MakeRequestTask(mCredential).execute();
+        }
+
         getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
         Bundle args = new Bundle();
         ((Callback) getActivity()).onSave(args);
@@ -534,6 +559,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         private String mId;
         private String oldId;
         private String mCalendarId = "";
+        private boolean delete;
 
 
         public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events, ArrayList<ContentValues> CVAL) {
@@ -548,6 +574,29 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     transport, jsonFactory, credential)
                     .setApplicationName("Goal Getter")
                     .build();
+            delete=false;
+        }
+        public MakeRequestTask(GoogleAccountCredential credential){
+            oldId=Utility.makeValidId(titleString);
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mService = new com.google.api.services.calendar.Calendar.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Goal Getter")
+                    .build();
+            delete=true;
+        }
+
+        public MakeRequestTask(GoogleAccountCredential credential, ArrayList<ContentValues> CVAL){
+            oldId=Utility.makeValidId(titleString);
+            mCVAL = CVAL;
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mService = new com.google.api.services.calendar.Calendar.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Goal Getter")
+                    .build();
+            delete=true;
         }
 
         /**
@@ -560,6 +609,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             com.google.api.services.calendar.model.Calendar calendar;
             SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
+
             try {
                 if (settings.contains(oldId)) {
                     mCalendarId = settings.getString(oldId, "");
@@ -574,14 +624,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         }
                     }
                 }
-                calendar = makeNewCalendar();
-                mCalendarId = calendar.getId();
-                editor.putString(mId, mCalendarId).apply();
+                if(!delete) {
+                    calendar = makeNewCalendar();
+                    mCalendarId = calendar.getId();
+                    editor.putString(mId, mCalendarId).apply();
 
 
-                for (Event event : mEvents) {
-                    mService.events().insert(mCalendarId, event).execute();
+                    for (Event event : mEvents) {
+                        mService.events().insert(mCalendarId, event).execute();
 
+                    }
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -603,10 +655,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
             return calendar;
         }
-
         @Override
         protected void onPostExecute(List<String> output) {
-            onSaveButton(mCVAL);
+            if (mCVAL != null) {
+                onSaveButton(mCVAL);
+            }
         }
 
         @Override
