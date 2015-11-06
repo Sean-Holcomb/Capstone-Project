@@ -533,7 +533,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         private String mSummary;
         private String mId;
         private String oldId;
-        private String mCalendarId= "";
+        private String mCalendarId = "";
 
 
         public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events, ArrayList<ContentValues> CVAL) {
@@ -563,52 +563,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             try {
                 if (settings.contains(oldId)) {
                     mCalendarId = settings.getString(oldId, "");
-                    Log.e("ppp", mCalendarId);
+                    editor.remove(oldId).apply();
                     CalendarList calendarList = mService.calendarList().list().execute();
-                    int length =calendarList.getItems().size();
-                    boolean calendarExists =false;
-                    for(int i =0; i<length; i++) {
-                     String tmpId = calendarList.getItems().get(i).getId();
-                        if (mCalendarId.equals(tmpId)){
-                            calendar= calendarList.getItems().get(i);
-                            calendarExists=true;
+                    int length = calendarList.getItems().size();
+                    for (int i = 0; i < length; i++) {
+                        String tmpId = calendarList.getItems().get(i).getId();
+                        if (mCalendarId.equals(tmpId)) {
+                            mService.calendars().delete(mCalendarId).execute();
+                            break;
                         }
                     }
-                    if (calendarExists) {
-                        //calendar = mService.calendars().get(mCalendarId).execute();
-                        calendar = new com.google.api.services.calendar.model.Calendar();
-                        Log.e("SSS",mSummary);
-                        calendar.setSummary(mSummary);
-                        if (!oldId.equals(mId)) {
-                            editor.remove(oldId)
-                                    .putString(mId, mCalendarId)
-                                    .apply();
-                        }
-
-                        com.google.api.services.calendar.model.Calendar updatedCalendar =
-                                mService.calendars().update(mCalendarId, calendar).execute();
-                    } else {
-                        calendar = makeNewCalendar();
-                        mCalendarId = calendar.getId();
-                        Log.e("jjj", mCalendarId);
-                        editor.remove(oldId)
-                                .putString(mId, mCalendarId)
-                                .apply();
-                    }
-                } else {
-
-                    calendar = makeNewCalendar();
-                    mCalendarId = calendar.getId();
-                    Log.e("RRR", mCalendarId);
-                    editor.putString(mId, mCalendarId).apply();
-
                 }
+                calendar = makeNewCalendar();
+                mCalendarId = calendar.getId();
+                editor.putString(mId, mCalendarId).apply();
 
-                if (!mCalendarId.equals("")) {
-                    for (Event event : mEvents) {
-                        mService.events().insert(mCalendarId, event).execute();
 
-                    }
+                for (Event event : mEvents) {
+                    mService.events().insert(mCalendarId, event).execute();
+
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -616,15 +589,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 Log.e("FFF", e.toString());
 
             }
+
             return null;
         }
 
-        private com.google.api.services.calendar.model.Calendar makeNewCalendar(){
+        private com.google.api.services.calendar.model.Calendar makeNewCalendar() {
             com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
             calendar.setSummary(mSummary);
-            try{
-               calendar = mService.calendars().insert(calendar).execute();
-            }catch(Exception e){
+            try {
+                calendar = mService.calendars().insert(calendar).execute();
+            } catch (Exception e) {
                 Log.e("jjj", "not making calendar");
             }
             return calendar;
