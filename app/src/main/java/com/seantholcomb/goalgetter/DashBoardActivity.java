@@ -27,8 +27,8 @@ import com.google.android.gms.ads.InterstitialAd;
 import java.util.Calendar;
 
 
-//todo add calanedar function
-//todo add setting
+//todo remove depricated methods
+//todo setting returns properly
 //todo clean up code
 //todo make ui nicer
 public class DashBoardActivity extends AppCompatActivity
@@ -267,7 +267,10 @@ public class DashBoardActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            getFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new SettingsFragment())
+                    .addToBackStack(null)
+                    .commit();
         }
 
         return super.onOptionsItemSelected(item);

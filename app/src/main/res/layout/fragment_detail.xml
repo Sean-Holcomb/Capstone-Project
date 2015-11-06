@@ -60,7 +60,7 @@
                 android:id="@+id/add_calendar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add Calendars"/>
+                android:text="@string/add_calendar"/>
 
             <TextView
                 android:layout_width="wrap_content"

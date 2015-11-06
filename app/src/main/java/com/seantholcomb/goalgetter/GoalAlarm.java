@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.CursorLoader;
@@ -66,8 +68,7 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
     private ArrayList<ContentValues> mCVArrayList;
     private ArrayList<String> mIdArrayList;
 
-    //Todo add option to turn off notifications and implement here
-    private boolean notificationsEnabled = true;
+    private boolean notificationsEnabled;
     private final String GROUP_TODO = "group_todo";
     private final String GROUP_COMPLETE = "group_complete";
 
@@ -77,6 +78,8 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     @Override
     public void onHandleIntent(Intent intent) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        notificationsEnabled=settings.getBoolean(getString(R.string.pref_noti_key), true);
         mCVArrayList = new ArrayList<>();
         mIdArrayList = new ArrayList<>();
         mCursorLoader = new CursorLoader(this, GoalContract.GoalEntry.GOAL_URI, Goal_COLUMNS, null, null, sortOrder);

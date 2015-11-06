@@ -25,6 +25,7 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="add_calendar">Add to Calendar</string>
     <string name="milestones">Milestones</string>
     <string name="add_milestone">Add Milestone</string>
     <string name="percent_sign">\u0025</string>
@@ -68,6 +69,10 @@
 
     <!--about Strings-->
     <string name="ok">Got It</string>
+
+    <!--Preference Strings-->
+    <string name="pref_noti_key">notification_key</string>
+    <string name="pref_noti_title">Turn On Notifications</string>
 
 
 </resources>
