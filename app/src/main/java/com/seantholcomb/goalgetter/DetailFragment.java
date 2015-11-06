@@ -38,6 +38,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.seantholcomb.goalgetter.data.GoalContract;
@@ -105,12 +106,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String dateString;
     private boolean isNew;
     //todo add checkbox for adding to calendar
-    private boolean calendarEnabled= true;
+    private boolean calendarEnabled = true;
 
     private GoogleAccountCredential mCredential;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
     public DetailFragment() {
         // Required empty public constructor
@@ -128,15 +129,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             isNew = false;
             titleString = args.getString(TITLE_KEY);
             double dateDouble = args.getDouble(DATE_KEY);
-            dateString =  Utility.getDate((long) dateDouble);
-            GoalValue=newGoal();
+            dateString = Utility.getDate((long) dateDouble);
+            GoalValue = newGoal();
             getLoaderManager().initLoader(0, args, this);
 
         } else {
             isNew = true;
             titleString = getString(R.string.title);
             dateString = getString(R.string.due_date);
-            GoalValue=newGoal();
+            GoalValue = newGoal();
         }
 
     }
@@ -159,7 +160,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
 
 
-        if (!settings.contains(PREF_ACCOUNT_NAME)){
+        if (!settings.contains(PREF_ACCOUNT_NAME)) {
             chooseAccount();
         }
 
@@ -176,7 +177,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         });
 
         mMilestoneAdapter = new MilestoneAdapter(getActivity());
-        if (!isNew){
+        if (!isNew) {
             mMilestoneAdapter.setmID(titleString);
             mMilestoneAdapter.setDueDate(Utility.getDateDouble(dateString));
         }
@@ -188,7 +189,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 CVAL.add(0, GoalValue);
                 if (calendarEnabled) {
                     addEvents(CVAL);
-                }else{
+                } else {
                     onSaveButton(CVAL);
                 }
 
@@ -202,7 +203,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 mMilestoneAdapter.cancel();
                 titleView.setText(titleString);
                 duedateView.setText(dateString);
-                if (isNew){
+                if (isNew) {
                     ((DashBoardActivity) getActivity()).openDrawer();
                 }
             }
@@ -243,10 +244,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 double duedate = Utility.getDateDouble(s.toString());
-                if (duedate>= GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)){
+                if (duedate >= GoalValue.getAsDouble(GoalContract.GoalEntry.COLUMN_START_DATE)) {
                     mMilestoneAdapter.setDueDate(duedate);
                     GoalValue.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, duedate);
-                }else if (duedate != -1.0){
+                } else if (duedate != -1.0) {
                     Toast.makeText(getActivity(), getString(R.string.date_prompt), Toast.LENGTH_SHORT).show();
                 }
 
@@ -259,15 +260,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         });
 
 
-
-
         mMilestoneGraph.setAdapter(mGoalAdapter);
         mMilestoneList.setAdapter(mMilestoneAdapter);
         setEditable(isNew);
         return rootView;
     }
 
-    public void onSaveButton(ArrayList<ContentValues> CVAL){
+    public void onSaveButton(ArrayList<ContentValues> CVAL) {
         isNew = false;
         getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
         titleString = GoalValue.getAsString(GoalContract.GoalEntry.COLUMN_ID);
@@ -311,7 +310,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void addDummyData() {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(GoalContract.GoalEntry.COLUMN_ID,"Learn toRead");
+        contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "Learn toRead");
         contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
         contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, "Learn toRead");
         contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, 2);
@@ -322,7 +321,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, 100);
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, 50);
         contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 50);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE) ;
+        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
         //getContext().getContentResolver().insert(GoalContract.GoalEntry.GOAL_URI, contentValues);
     }
 
@@ -333,7 +332,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-    public void getGoal(Cursor cursor){
+    public void getGoal(Cursor cursor) {
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
             if (cursor.getString(COL_TYPE).equals(GoalContract.GoalEntry.GOAL)) {
@@ -354,7 +353,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-    public ContentValues newGoal(){
+    public ContentValues newGoal() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "");
         contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
@@ -371,12 +370,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return contentValues;
     }
 
-    public void setGoalTasks(ArrayList<ContentValues> CVAL){
-        int total=0;
+    public void setGoalTasks(ArrayList<ContentValues> CVAL) {
+        int total = 0;
         int done = 0;
         int missed = 0;
         int remaining = 0;
-        for (int i =0; i<CVAL.size();i++){
+        for (int i = 0; i < CVAL.size(); i++) {
             total += (int) CVAL.get(i).get(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS);
             done += (int) CVAL.get(i).get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
             missed += (int) CVAL.get(i).get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
@@ -397,7 +396,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_ACCOUNT_PICKER:
                 if (data != null &&
                         data.getExtras() != null) {
@@ -418,18 +417,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void addEvents(ArrayList<ContentValues> CVAL){
+    public void addEvents(ArrayList<ContentValues> CVAL) {
         String baseId = "goalgetterevent";
         ArrayList<Event> events = new ArrayList<>();
 
-        for (int i = 0; i<CVAL.size();i++) {
+        for (int i = 0; i < CVAL.size(); i++) {
             String summary = CVAL.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
             long dueDate = CVAL.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE);
 
 
             DateTime dateTime = new DateTime(new Date(dueDate));
             EventDateTime start = new EventDateTime();
-            DateTime endTime = new DateTime(new Date(dueDate+24*60*60*1000));
+            DateTime endTime = new DateTime(new Date(dueDate + 24 * 60 * 60 * 1000));
             EventDateTime end = new EventDateTime();
             end.setDateTime(endTime);
             start.setDateTime(dateTime);
@@ -458,7 +457,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 goalUri,
                 Goal_COLUMNS,
                 null,
-                new String[] {id},
+                new String[]{id},
                 sortOrder);
     }
 
@@ -493,13 +492,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         public EditText dateView;
 
-        public DatePickerFragment(){
+        public DatePickerFragment() {
             super();
         }
 
-        public DatePickerFragment(View v){
+        public DatePickerFragment(View v) {
             super();
-            dateView= (EditText) v;
+            dateView = (EditText) v;
         }
 
         @Override
@@ -528,17 +527,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
-        private ArrayList<Event> mEvents =null;
+        private ArrayList<Event> mEvents = null;
         private Exception mLastError = null;
         private ArrayList<ContentValues> mCVAL;
+        private String mSummary;
         private String mId;
+        private String oldId;
+        private String mCalendarId= "";
+
 
         public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events, ArrayList<ContentValues> CVAL) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mEvents=events;
-            mCVAL= CVAL;
-            mId= CVAL.get(0).getAsString(GoalContract.GoalEntry.COLUMN_ID);
+            mEvents = events;
+            mCVAL = CVAL;
+            mSummary = CVAL.get(0).getAsString(GoalContract.GoalEntry.COLUMN_ID);
+            mId = Utility.makeValidId(mSummary);
+            oldId = Utility.makeValidId(titleString);
             mService = new com.google.api.services.calendar.Calendar.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Goal Getter")
@@ -552,25 +557,77 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
          */
         @Override
         protected List<String> doInBackground(Void... params) {
+            com.google.api.services.calendar.model.Calendar calendar;
+            SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
             try {
-                //com.google.api.services.calendar.model.Calendar calendar = mService.calendars().get(titleString).execute();
-                //if (calendar != null){
-                //    calendar.clear();
-                //    calendar.setId(mId);
-                //    calendar.setSummary(mId);
-                //    calendar.
-                //}
-                for (Event event : mEvents) {
-                    mService.events().insert("primary", event).execute();
+                if (settings.contains(oldId)) {
+                    mCalendarId = settings.getString(oldId, "");
+                    Log.e("ppp", mCalendarId);
+                    CalendarList calendarList = mService.calendarList().list().execute();
+                    int length =calendarList.getItems().size();
+                    boolean calendarExists =false;
+                    for(int i =0; i<length; i++) {
+                     String tmpId = calendarList.getItems().get(i).getId();
+                        if (mCalendarId.equals(tmpId)){
+                            calendar= calendarList.getItems().get(i);
+                            calendarExists=true;
+                        }
+                    }
+                    if (calendarExists) {
+                        //calendar = mService.calendars().get(mCalendarId).execute();
+                        calendar = new com.google.api.services.calendar.model.Calendar();
+                        Log.e("SSS",mSummary);
+                        calendar.setSummary(mSummary);
+                        if (!oldId.equals(mId)) {
+                            editor.remove(oldId)
+                                    .putString(mId, mCalendarId)
+                                    .apply();
+                        }
 
+                        com.google.api.services.calendar.model.Calendar updatedCalendar =
+                                mService.calendars().update(mCalendarId, calendar).execute();
+                    } else {
+                        calendar = makeNewCalendar();
+                        mCalendarId = calendar.getId();
+                        Log.e("jjj", mCalendarId);
+                        editor.remove(oldId)
+                                .putString(mId, mCalendarId)
+                                .apply();
+                    }
+                } else {
+
+                    calendar = makeNewCalendar();
+                    mCalendarId = calendar.getId();
+                    Log.e("RRR", mCalendarId);
+                    editor.putString(mId, mCalendarId).apply();
+
+                }
+
+                if (!mCalendarId.equals("")) {
+                    for (Event event : mEvents) {
+                        mService.events().insert(mCalendarId, event).execute();
+
+                    }
                 }
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
                 Log.e("FFF", e.toString());
-                return null;
+
             }
             return null;
+        }
+
+        private com.google.api.services.calendar.model.Calendar makeNewCalendar(){
+            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+            calendar.setSummary(mSummary);
+            try{
+               calendar = mService.calendars().insert(calendar).execute();
+            }catch(Exception e){
+                Log.e("jjj", "not making calendar");
+            }
+            return calendar;
         }
 
         @Override
@@ -583,9 +640,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             if (mLastError != null) {
                 if (mLastError instanceof UserRecoverableAuthIOException) {
-                        startActivityForResult(
-                                ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                                REQUEST_AUTHORIZATION);
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            REQUEST_AUTHORIZATION);
 
                 }
             }

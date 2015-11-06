@@ -120,8 +120,16 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
             if (notificationsEnabled && mCVArrayList.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE) <= calendar.getTimeInMillis()
                     && !mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
-                int id = (int) mCVArrayList.get(i).get(GoalContract.GoalEntry._ID);
+
                 String name = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
+                String idString = Utility.makeValidId(name);
+                if (idString.length()>9){
+                    idString = idString.substring(0,8);
+                }
+                while (idString.charAt(0)=='0'){
+                    idString = idString.substring(1);
+                }
+                int id = Integer.valueOf(idString);
                 mBuilder =
                         new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.ic_drawer)
@@ -139,8 +147,15 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
                     && mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TYPE).equals(GoalContract.GoalEntry.MILESTONE)) {
                 showNotification = checkOnTrack(i);
                 if (notificationsEnabled && showNotification) {
-                    int id = mCVArrayList.get(i).getAsInteger(GoalContract.GoalEntry._ID);
                     String task = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
+                    String idString = Utility.makeValidId(task);
+                    if (idString.length()>9){
+                        idString = idString.substring(0,8);
+                    }
+                    while (idString.charAt(0)=='0'){
+                        idString = idString.substring(1);
+                    }
+                    int id = Integer.valueOf(idString);
                     mBuilder =
                             new NotificationCompat.Builder(this)
                                     .setSmallIcon(R.drawable.ic_drawer)

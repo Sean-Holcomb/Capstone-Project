@@ -1,5 +1,7 @@
 package com.seantholcomb.goalgetter;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -64,6 +66,98 @@ public class Utility {
         return (double) -1;
 
 
+    }
+
+    public static String makeValidId(String id){
+        id = id.toLowerCase();
+        String returnString = "";
+        int length = id.length();
+        for (int i = 0; i < length; i++){
+           switch (id.charAt(i)){
+               case 'a' :
+                   returnString = returnString + "00";
+                   break;
+               case 'b' :
+                   returnString = returnString + "01";
+                   break;
+               case 'c' :
+                   returnString = returnString + "02";
+                   break;
+               case 'd' :
+                   returnString = returnString + "03";
+                   break;
+               case 'e' :
+                   returnString = returnString + "04";
+                   break;
+               case 'f' :
+                   returnString = returnString + "05";
+                   break;
+               case 'g' :
+                   returnString = returnString + "06";
+                   break;
+               case 'h' :
+                   returnString = returnString + "07";
+                   break;
+               case 'i' :
+                   returnString = returnString + "08";
+                   break;
+               case 'j' :
+                   returnString = returnString + "09";
+                   break;
+               case 'k' :
+                   returnString = returnString + "10";
+                   break;
+               case 'l' :
+                   returnString = returnString + "11";
+                   break;
+               case 'm' :
+                   returnString = returnString + "12";
+                   break;
+               case 'n' :
+                   returnString = returnString + "13";
+                   break;
+               case 'o' :
+                   returnString = returnString + "14";
+                   break;
+               case 'p' :
+                   returnString = returnString + "15";
+                   break;
+               case 'q' :
+                   returnString = returnString + "16";
+                   break;
+               case 'r' :
+                   returnString = returnString + "17";
+                   break;
+               case 's' :
+                   returnString = returnString + "18";
+                   break;
+               case 't' :
+                   returnString = returnString + "19";
+                   break;
+               case 'u' :
+                   returnString = returnString + "20";
+                   break;
+               case 'v' :
+                   returnString = returnString + "21";
+                   break;
+               case 'w' :
+                   returnString = returnString + "22";
+                   break;
+               case 'x' :
+                   returnString = returnString + "23";
+                   break;
+               case 'y' :
+                   returnString = returnString + "24";
+                   break;
+               case 'z' :
+                   returnString = returnString + "25";
+                   break;
+               default:
+                   returnString = returnString + "99";
+            }
+        }
+        Log.e("JJJ", returnString + " from " + id);
+        return returnString;
     }
 
 }
