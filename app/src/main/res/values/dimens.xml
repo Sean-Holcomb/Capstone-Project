@@ -13,4 +13,6 @@
     <dimen name="widget_todo_default_height">110dp</dimen>
     <dimen name="widget_todo_min_resize_width">180dp</dimen>
     <dimen name="widget_todo_min_resize_height">@dimen/widget_todo_default_height</dimen>
+
+    <dimen name="banner_padding">50dp</dimen>
 </resources>

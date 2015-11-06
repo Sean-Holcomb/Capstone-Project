@@ -39,7 +39,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
 
 
     /**
-     * Cache of the children views for a todo list item.
+     * Cache of the children views for a to-do list item.
      */
     public class TodoAdapterViewHolder extends RecyclerView.ViewHolder {
         public final CheckBox mBox;

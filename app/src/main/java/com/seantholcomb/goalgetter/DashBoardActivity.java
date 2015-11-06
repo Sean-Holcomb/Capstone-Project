@@ -82,9 +82,7 @@ public class DashBoardActivity extends AppCompatActivity
                 AlarmManager.INTERVAL_DAY,
                 alarmIntent);
 
-        //todo banner ad should go behind keyboard
         //todo fix interstitial ad
-        //todo make banner ads not block content
         //admob ad setup
         //mInterstitialAd = new InterstitialAd(this);
         //mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
