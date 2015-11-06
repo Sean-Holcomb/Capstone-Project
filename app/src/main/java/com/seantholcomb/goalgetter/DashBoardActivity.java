@@ -15,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -82,7 +81,7 @@ public class DashBoardActivity extends AppCompatActivity
                 calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY,
                 alarmIntent);
-        Log.e("JJJ", "Alarm set");
+
         //todo banner ad should go behind keyboard
         //todo fix interstitial ad
         //todo make banner ads not block content
@@ -146,6 +145,7 @@ public class DashBoardActivity extends AppCompatActivity
 
         fragmentManager.beginTransaction()
                 .replace(R.id.container, mfragment)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -165,6 +165,7 @@ public class DashBoardActivity extends AppCompatActivity
         mfragment=fragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
+                .addToBackStack(null)
                 .commit();
         menuLayout= R.menu.detail;
         invalidateOptionsMenu();

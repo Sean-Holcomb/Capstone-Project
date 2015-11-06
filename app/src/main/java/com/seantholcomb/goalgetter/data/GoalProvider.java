@@ -127,23 +127,11 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
-    /*
-        Students: Here is where you need to create the UriMatcher. This UriMatcher will
-        match each URI to the WEATHER, WEATHER_WITH_LOCATION, WEATHER_WITH_LOCATION_AND_DATE,
-        and LOCATION integer constants defined above.  You can test this by uncommenting the
-        testUriMatcher test within TestUriMatcher.
-     */
-    static UriMatcher buildUriMatcher() {
-        // I know what you're thinking.  Why create a UriMatcher when you can use regular
-        // expressions instead?  Because you're not crazy, that's why.
 
-        // All paths added to the UriMatcher have a corresponding code to return when a match is
-        // found.  The code passed into the constructor represents the code to return for the root
-        // URI.  It's common to use NO_MATCH as the code for this case.
+    static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = GoalContract.CONTENT_AUTHORITY;
 
-        // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, GoalContract.PATH_PAST, PAST);
         matcher.addURI(authority, GoalContract.PATH_CURRENT, CURRENT);
         matcher.addURI(authority, GoalContract.PATH_TODO, TODO);
@@ -153,29 +141,21 @@ public class GoalProvider extends ContentProvider {
         return matcher;
     }
 
-    /*
-        Students: We've coded this for you.  We just create a new WeatherDbHelper for later use
-        here.
-     */
     @Override
     public boolean onCreate() {
         mOpenHelper = new GoalDbHelper(getContext());
         return true;
     }
 
-    /*
-        Students: Here's where you'll code the getType function that uses the UriMatcher.  You can
-        test this by uncommenting testGetType in TestProvider.
 
-     */
     @Override
     public String getType(Uri uri) {
 
-        // Use the Uri Matcher to determine what kind of URI this is.
+
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
+
             case GOAL:
                 return GoalContract.GoalEntry.CONTENT_TYPE;
             case PAST:
@@ -194,8 +174,7 @@ public class GoalProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
-        // Here's the switch statement that, given a URI, will determine what kind of request it is,
-        // and query the database accordingly.
+
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
 
@@ -230,9 +209,7 @@ public class GoalProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Locations to the implementation of this function.
-     */
+
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -338,9 +315,6 @@ public class GoalProvider extends ContentProvider {
         }
     }
 
-    // You do not need to call this method. This is a method specifically to assist the testing
-    // framework in running smoothly. You can read more at:
-    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
     @Override
     @TargetApi(11)
     public void shutdown() {

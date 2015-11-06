@@ -68,12 +68,9 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                     if (data != null) {
                         data.close();
                     }
-                    // This method is called by the app hosting the widget (e.g., the launcher)
-                    // However, our ContentProvider is not exported so it doesn't have access to the
-                    // data. Therefore we need to clear (and finally restore) the calling identity so
-                    // that calls use our process and permission
+
                     final long identityToken = Binder.clearCallingIdentity();
-                    // Get today's data from the ContentProvider
+
 
                     Uri TodoUri = GoalContract.GoalEntry.TODO_URI;
                     data = getContentResolver().query(

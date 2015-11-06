@@ -12,7 +12,8 @@ import java.util.Date;
  */
 public class Utility {
 
-    /*Method to calculate the percentages used in the graph item
+    /**
+    *Method to calculate the percentages used in the graph item
     * @param total number of tasks, the amount of tasks done, the amount of tasks missed
     * @return int[] {percent tasks done, percent tasks missed, remaining percent}
     */

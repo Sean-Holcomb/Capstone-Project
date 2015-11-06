@@ -28,8 +28,8 @@ public class BootReceiver extends BroadcastReceiver{
             calendar.setTimeInMillis(System.currentTimeMillis());
             calendar.set(Calendar.HOUR_OF_DAY, 0);
 
-            // set the alarm to repeat daily but not to go off until the device is woken up
-            alarmMgr.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+            // set the alarm to repeat daily
+            alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, alarmIntent);
         }
     }

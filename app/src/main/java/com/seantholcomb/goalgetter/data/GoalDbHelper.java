@@ -10,7 +10,6 @@ import com.seantholcomb.goalgetter.data.GoalContract.GoalEntry;
  */
 public class GoalDbHelper extends SQLiteOpenHelper{
 
-    // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 1;
 
     static final String DATABASE_NAME = "goalgetter.db";
@@ -21,8 +20,6 @@ public class GoalDbHelper extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create a table to hold locations.  A location consists of the string supplied in the
-        // location setting, the city name, and the latitude and longitude
         final String SQL_CREATE_GOAL_TABLE = "CREATE TABLE " + GoalEntry.TABLE_NAME + " (" +
                 GoalEntry._ID + " INTEGER PRIMARY KEY, " +
                 GoalEntry.COLUMN_ID + " TEXT NOT NULL, " +

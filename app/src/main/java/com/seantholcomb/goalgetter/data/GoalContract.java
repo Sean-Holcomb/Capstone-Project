@@ -96,7 +96,7 @@ public class GoalContract {
         public static final String COMPLETE="complete";
         public static final String CONCURRENT="concurrent";
 
-        //Type column type
+        //Type column types
         public static final String GOAL = "goal";
         public static final String MILESTONE = "milestone";
 

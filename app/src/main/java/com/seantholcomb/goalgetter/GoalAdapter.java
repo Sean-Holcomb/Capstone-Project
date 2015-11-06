@@ -20,10 +20,6 @@ import java.util.Calendar;
  */
 public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterViewHolder> {
 
-    private static final int VIEW_TYPE_COMPLETE = 0;
-    private static final int VIEW_TYPE_CURRENT = 1;
-
-
     private Cursor mCursor;
     final private Context mContext;
     final private GoalAdapterOnClickHandler mClickHandler;
@@ -34,7 +30,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
     /**
-     * Cache of the children views for a forecast list item.
+     * Cache of the children views for a goal list item.
      */
     public class GoalAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mRedBar;
@@ -63,7 +59,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
             mCursor.moveToPosition(adapterPosition);
             int idColumnIndex = mCursor.getColumnIndex(GoalContract.GoalEntry.COLUMN_ID);
             mClickHandler.onClick(mCursor.getString(idColumnIndex), this);
-            //mICM.onClick(this);
+
         }
     }
 
@@ -78,14 +74,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
 
     }
 
-    /*
-        This takes advantage of the fact that the viewGroup passed to onCreateViewHolder is the
-        RecyclerView that will be used to contain the view, so that it can get the current
-        ItemSelectionManager from the view.
 
-        One could implement this pattern without modifying RecyclerView by taking advantage
-        of the view tag to store the ItemChoiceManager.
-     */
     @Override
     public GoalAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if ( viewGroup instanceof RecyclerView ) {
@@ -168,14 +157,10 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     }
 
 
-//    public int getSelectedItemPosition() {
-        //return mICM.getSelectedItemPosition();
-//    }
 
     @Override
     public int getItemViewType(int position) {
         return position;
-        //return (position == 0 && mUseTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
     }
 
     @Override
@@ -195,13 +180,4 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
     public Cursor getCursor() {
         return mCursor;
     }
-
-    public void selectView(RecyclerView.ViewHolder viewHolder) {
-        if ( viewHolder instanceof GoalAdapterViewHolder ) {
-            GoalAdapterViewHolder vfh = (GoalAdapterViewHolder)viewHolder;
-            vfh.onClick(vfh.itemView);
-        }
-    }
-
-
 }

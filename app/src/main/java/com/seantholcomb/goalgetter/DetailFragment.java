@@ -193,7 +193,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     }
                 }
                 calendarActive=isChecked;
-                Log.e("EEE", String.valueOf(calendarActive));
             }
         });
         addCalendar.setChecked(calendarActive);
@@ -326,24 +325,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMilestoneAdapter.makeEditable(editable);
 
 
-    }
-
-    public void addDummyData() {
-        ContentValues contentValues = new ContentValues();
-
-        contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "Learn toRead");
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TYPE, GoalContract.GoalEntry.GOAL);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_NAME, "Learn toRead");
-        contentValues.put(GoalContract.GoalEntry.COLUMN_START_DATE, 2);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_DUE_DATE, 1);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASK, "read good)");
-        contentValues.put(GoalContract.GoalEntry.COLUMN_FREQUENCY, 3);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS, 200);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, 100);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, 50);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, 50);
-        contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
-        //getContext().getContentResolver().insert(GoalContract.GoalEntry.GOAL_URI, contentValues);
     }
 
     public void deleteGoal() {
@@ -638,7 +619,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
-                Log.e("FFF", e.toString());
 
             }
 
@@ -651,7 +631,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             try {
                 calendar = mService.calendars().insert(calendar).execute();
             } catch (Exception e) {
-                Log.e("jjj", "not making calendar");
             }
             return calendar;
         }

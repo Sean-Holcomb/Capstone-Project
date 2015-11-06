@@ -39,7 +39,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
 
 
     /**
-     * Cache of the children views for a forecast list item.
+     * Cache of the children views for a milestone list item.
      */
     public class MilestoneAdapterViewHolder extends RecyclerView.ViewHolder {
         public final EditText titleView;
@@ -73,14 +73,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
     }
 
 
-    /*
-        This takes advantage of the fact that the viewGroup passed to onCreateViewHolder is the
-        RecyclerView that will be used to contain the view, so that it can get the current
-        ItemSelectionManager from the view.
 
-        One could implement this pattern without modifying RecyclerView by taking advantage
-        of the view tag to store the ItemChoiceManager.
-     */
     @Override
     public MilestoneAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if (viewGroup instanceof RecyclerView) {
@@ -287,7 +280,7 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, cursor.getInt(DashboardFragment.COL_REMAINING_TASKS));
             contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, cursor.getString(DashboardFragment.COL_STATUS));
             mCVArrayList.add(contentValues);
-            //mContext.getContentResolver().insert(GoalContract.GoalEntry.GOAL_URI, contentValues);
+
         }
     }
 
@@ -437,7 +430,6 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         mCursor = newCursor;
         makeValue(mCursor);
         notifyDataSetChanged();
-        //mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public Cursor getCursor() {

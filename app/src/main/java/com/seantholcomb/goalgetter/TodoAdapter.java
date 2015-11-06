@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +39,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
 
 
     /**
-     * Cache of the children views for a forecast list item.
+     * Cache of the children views for a todo list item.
      */
     public class TodoAdapterViewHolder extends RecyclerView.ViewHolder {
         public final CheckBox mBox;
@@ -64,14 +63,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
         //mEmptyView = emptyView;
     }
 
-    /*
-        This takes advantage of the fact that the viewGroup passed to onCreateViewHolder is the
-        RecyclerView that will be used to contain the view, so that it can get the current
-        ItemSelectionManager from the view.
 
-        One could implement this pattern without modifying RecyclerView by taking advantage
-        of the view tag to store the ItemChoiceManager.
-     */
     @Override
     public TodoAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if (viewGroup instanceof RecyclerView) {
@@ -205,28 +197,22 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
     }
 
     public void checkOnTrack(TodoAdapterViewHolder todoAdapterViewHolder, int position) {
-        Log.e("EEE", "checking");
+
         int done = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
         int remaining = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING);
         double start = (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis());
-        Log.e("EEE", "done " + done);
-        Log.e("EEE", "missed" + missed);
-        Log.e("EEE", "remaining " + remaining);
-        Log.e("EEE", "checking");
         double end = mCVArrayList.get(position).getAsDouble(GoalContract.GoalEntry.COLUMN_DUE_DATE);
         int freq = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_FREQUENCY);
 
 
         int total = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TOTAL_TASKS);
-        Log.e("EEE", "total  " + total);
+
         double dif = end - start;
         dif = dif / (1000 * 60 * 60 * 24);
         dif = dif / 7 * freq;
         int difDays = (int) dif;
-        Log.e("EEE", "remaining difdays  " + difDays);
         difDays = total - done - missed - difDays;
-        Log.e("EEE", "value difdays  " + difDays);
         if (difDays > 0) {
             missed += difDays;
             remaining -= difDays;
