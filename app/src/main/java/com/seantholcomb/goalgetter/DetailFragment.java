@@ -457,7 +457,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             EventDateTime end = new EventDateTime();
             end.setDateTime(endTime);
             start.setDateTime(dateTime);
-
+            //todo make events nicer ie. all day, availible, no notifications
             Event event = new Event()
                     .setSummary(summary)
                     .setStart(start)

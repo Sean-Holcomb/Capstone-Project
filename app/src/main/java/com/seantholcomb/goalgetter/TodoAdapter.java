@@ -23,12 +23,18 @@ import java.util.Calendar;
  */
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterViewHolder> {
     private ArrayList<ContentValues> mCVArrayList;
+    private ArrayList<ContentValues> mGoalArrayList;
     private Cursor mCursor;
     final private Context mContext;
 
     private static final String sUpdateSelection =
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TASK + " = ? ";
+    private static final String sUpdateGoalSelection =
+            GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? AND " +
+                    GoalContract.GoalEntry.TABLE_NAME +
+                    "." + GoalContract.GoalEntry.COLUMN_ID + " = ? ";
 
 
 
@@ -54,7 +60,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
     public TodoAdapter(Context context) {
         mContext = context;
         mCVArrayList = new ArrayList<ContentValues>();
-
+        mGoalArrayList = new ArrayList<ContentValues>();
         //mEmptyView = emptyView;
     }
 
@@ -84,29 +90,48 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
         String title = mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
         todoAdapterViewHolder.mTitleView.setText(title);
         todoAdapterViewHolder.mBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            //todo fix problem with check box
+
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                ContentValues task = mCVArrayList.get(position);
+                String id = task.getAsString(GoalContract.GoalEntry.COLUMN_ID);
+                ContentValues goal = new ContentValues();
+                for (int i =0; i < mGoalArrayList.size();i++){
+                    if (mGoalArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_ID).equals(id)){
+                        goal =mGoalArrayList.get(i);
+                    }
+                }
                 if (isChecked) {
-                    int plus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) + 1;
-                    int minus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) - 1;
-                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, plus);
-                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, minus);
-                    Log.e("EEE", "changed");
+                    int plus = task.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) + 1;
+                    int minus = task.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) - 1;
+                    task.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, plus);
+                    task.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, minus);
+                    plus = goal.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) + 1;
+                    minus = goal.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) - 1;
+                    goal.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, plus);
+                    goal.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, minus);
                 } else {
-                    int minus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) - 1;
-                    int plus = mCVArrayList.get(position).getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) + 1;
-                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, minus);
-                    mCVArrayList.get(position).put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, plus);
+                    int minus = task.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) - 1;
+                    int plus = task.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) + 1;
+                    task.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, minus);
+                    task.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, plus);
+                    minus = goal.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_DONE) - 1;
+                    plus = goal.getAsInteger(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING) + 1;
+                    goal.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, minus);
+                    goal.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, plus);
                 }
 
-                mCursor.moveToPosition(position);
-                String selectionArgs =  mCVArrayList.get(position).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
-                int updated = mContext.getContentResolver().update(GoalContract.BASE_CONTENT_URI,
-                        mCVArrayList.get(position),
+                String selectionArgs =  task.getAsString(GoalContract.GoalEntry.COLUMN_TASK);
+                mContext.getContentResolver().update(GoalContract.BASE_CONTENT_URI,
+                        task,
                         sUpdateSelection,
-                        new String[] {selectionArgs});
-                Log.e("EEEE", updated + "");
+                        new String[]{selectionArgs});
+
+                mContext.getContentResolver().update(GoalContract.BASE_CONTENT_URI,
+                        goal,
+                        sUpdateGoalSelection,
+                        new String[]{GoalContract.GoalEntry.GOAL,  id});
+
             }
         });
     }
@@ -139,8 +164,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
 
     public void makeValue(Cursor cursor) {
         mCVArrayList.clear();
-
+        mGoalArrayList.clear();
         for (int i = 0; i < cursor.getCount(); i++) {
+
             cursor.moveToPosition(i);
             ContentValues contentValues = new ContentValues();
             contentValues.put(GoalContract.GoalEntry.COLUMN_ID, cursor.getString(DashboardFragment.COL_GOAL_ID));
@@ -155,6 +181,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_MISSED, cursor.getInt(DashboardFragment.COL_MISSED_TASKS));
             contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, cursor.getInt(DashboardFragment.COL_REMAINING_TASKS));
             contentValues.put(GoalContract.GoalEntry.COLUMN_STATUS, cursor.getString(DashboardFragment.COL_STATUS));
+            if (contentValues.getAsString(GoalContract.GoalEntry.COLUMN_TYPE).equals(GoalContract.GoalEntry.GOAL)){
+                mGoalArrayList.add(contentValues);
+                continue;
+            }
             if (contentValues.getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE)
                     < GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis())){
                 contentValues.put(GoalContract.GoalEntry.COLUMN_TASKS_DONE, cursor.getInt(DashboardFragment.COL_DONE_TASK)

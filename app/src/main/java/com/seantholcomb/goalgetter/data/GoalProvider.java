@@ -47,9 +47,7 @@ public class GoalProvider extends ContentProvider {
 
     private static final String sTodoSelection =
             GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? AND " +
-                    GoalContract.GoalEntry.TABLE_NAME +
-                    "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
+                    "." + GoalContract.GoalEntry.COLUMN_STATUS + " = ? ";
 
     private static final String sCurrentSelection =
             GoalContract.GoalEntry.TABLE_NAME +
@@ -122,7 +120,7 @@ public class GoalProvider extends ContentProvider {
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sTodoSelection,
-                new String[] {GoalContract.GoalEntry.ACTIVE, GoalContract.GoalEntry.MILESTONE},
+                new String[] {GoalContract.GoalEntry.ACTIVE},
                 null,
                 null,
                 sortOrder
