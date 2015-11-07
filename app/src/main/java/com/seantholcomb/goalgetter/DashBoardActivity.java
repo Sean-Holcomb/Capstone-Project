@@ -23,13 +23,13 @@ import com.google.android.gms.ads.AdView;
 import java.util.Calendar;
 
 
-//todo move settings and titles to fragments
 //Todo softkeyboard closes when not in use
 //todo make ui nicer
 //todo widget ui too
 //todo add content descriptions
 //todo publish app
 //todo add fade transitions
+//todo add about texts
 
 public class DashBoardActivity extends AppCompatActivity
         implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener  {
@@ -83,8 +83,12 @@ public class DashBoardActivity extends AppCompatActivity
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        if (savedInstanceState == null)
-        navigate(mNavItemId);
+        if (savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, new DashboardFragment())
+                    .commit();
+        }
+
 
 
         //Set Alarm for database incrementation and notifications

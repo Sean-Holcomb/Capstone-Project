@@ -20,7 +20,7 @@ import com.seantholcomb.goalgetter.data.GoalContract;
 public class TodoWidgetRemoteViewsService extends RemoteViewsService {
         private static final String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
 
-
+    //todo fix widget adaptor
     private static final String[] Goal_COLUMNS = {
 
             GoalContract.GoalEntry.TABLE_NAME + "." + GoalContract.GoalEntry._ID,
@@ -107,9 +107,6 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                             data == null || !data.moveToPosition(position)) {
                         return views;
                     }
-
-                    views.setTextViewText(R.id.todo_title, data.getString(COL_TASK));
-
 
                     return views;
                 }

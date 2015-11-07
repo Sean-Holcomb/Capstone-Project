@@ -18,8 +18,8 @@
     <string name="action_delete">Delete Goal</string>
 
     <!--Dashboard Strings-->
-    <string name="todo_label">TODO Today:</string>
-    <string name="current_label">Current Goals:</string>
+    <string name="todo_label">TODO Today</string>
+    <string name="current_label">Current Goals</string>
     <string name="past_label">Past Goals</string>
 
     <!--Detail Strings -->
