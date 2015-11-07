@@ -77,6 +77,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle(getString(R.string.title_section1));
         getLoaderManager().initLoader(CURRENT_LOADER, null, this);
         getLoaderManager().initLoader(PAST_LOADER, null, this);
         getLoaderManager().initLoader(TODO_LOADER, null, this);

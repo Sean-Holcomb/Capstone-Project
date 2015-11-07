@@ -1,26 +1,20 @@
 package com.seantholcomb.goalgetter;
 
 import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.ads.AdRequest;
@@ -41,14 +35,13 @@ public class DashBoardActivity extends AppCompatActivity
         implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener  {
 
 
-    private CharSequence mTitle;
-    private int menuLayout;
-    private Fragment mfragment;
+
+
+
     SettingsFragment mSettingsFragment;
     private final String TITLE_KEY= "title";
     private final String DUE_DATE_KEY = "due_date";
     private static final String NAV_ITEM_ID = "navItemId";
-    private static final String MENU_ID = "menuId";
     private static final long DRAWER_CLOSE_DELAY_MS = 250;
 
     private AlarmManager alarmMgr;
@@ -67,20 +60,17 @@ public class DashBoardActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        mTitle = getTitle();
 
         mSettingsFragment = new SettingsFragment();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(mTitle);
+
         setSupportActionBar(toolbar);
 
         if (null == savedInstanceState) {
             mNavItemId = R.id.drawer_item_dashboard;
-            menuLayout=R.menu.dash_board;
         } else {
             mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
-            menuLayout = savedInstanceState.getInt(MENU_ID);
         }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -142,20 +132,17 @@ public class DashBoardActivity extends AppCompatActivity
     private void navigate(final int itemId) {
 
         // update the main content by replacing fragments
+        Fragment fragment;
         FragmentManager fragmentManager = getSupportFragmentManager();
         getFragmentManager().beginTransaction().remove(mSettingsFragment).commit();
         switch (itemId){
 
 
             case R.id.drawer_item_detail:
-                mTitle = getString(R.string.title_section2);
-                menuLayout = R.menu.detail;
-                mfragment = new DetailFragment();
+                fragment = new DetailFragment();
                 break;
             case R.id.drawer_item_focus:
-                mfragment  = new FocusTimerFragment();
-                mTitle = getString(R.string.title_section3);
-                menuLayout = R.menu.focus_timer;
+                fragment  = new FocusTimerFragment();
                 //if (mInterstitialAd.isLoaded()) {
                 //    mInterstitialAd.show();
                 //}
@@ -167,15 +154,12 @@ public class DashBoardActivity extends AppCompatActivity
 
                 return;
             default:
-                mTitle = getString(R.string.title_section1);
-                menuLayout = R.menu.dash_board;
-                mfragment= new DashboardFragment();
+
+                fragment= new DashboardFragment();
 
         }
-        toolbar.setTitle(mTitle);
-        invalidateOptionsMenu();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, mfragment)
+                .replace(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
@@ -223,109 +207,31 @@ public class DashBoardActivity extends AppCompatActivity
         }
         Fragment fragment = new DetailFragment();
         fragment.setArguments(args);
-        mfragment=fragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
-        menuLayout= R.menu.detail;
         mNavItemId = R.id.drawer_item_detail;
-        invalidateOptionsMenu();
     }
 
     @Override
     public void onSave(Bundle args){
         Fragment fragment = new DetailFragment();
         fragment.setArguments(args);
-        mfragment=fragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
-        menuLayout= R.menu.detail;
-        invalidateOptionsMenu();
-    }
 
-
-    public void restoretoolar() {
-        //Toolbar toolbar = getSupportActionBar();
-        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        //toolbar.setDisplayShowTitleEnabled(true);
-        //toolbar.setTitle(mTitle);
-
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(menuLayout, menu);
-        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         if (id == android.support.v7.appcompat.R.id.home) {
-            toolbar.setTitle(R.string.app_name);
             return mDrawerToggle.onOptionsItemSelected(item);
         }
-        if (menuLayout == R.menu.focus_timer){
-            if (id == R.id.action_about){
-                DialogFragment newFragment = new DialogFragment(){
-                    @Override
-                    public Dialog onCreateDialog (Bundle savedInstanceState){
-                        LayoutInflater inflater = getActivity().getLayoutInflater();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setView(inflater.inflate(R.layout.dialog_about_focus_timer, null));
-                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                //Nothing needed here
-                            }
-                        });
-
-                        return builder.create();
-                    }
-                };
-
-                newFragment.show(getSupportFragmentManager(), "aboutFocus");
-            }
-        }
-
-        if (menuLayout == R.menu.detail){
-            if (id == R.id.action_about_detail){
-                DialogFragment newFragment = new DialogFragment(){
-                    @Override
-                    public Dialog onCreateDialog (Bundle savedInstanceState){
-                        LayoutInflater inflater = getActivity().getLayoutInflater();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setView(inflater.inflate(R.layout.dialog_about_detail, null));
-                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                //Nothing needed here
-                            }
-                        });
-
-                        return builder.create();
-                    }
-                };
-
-                newFragment.show(getSupportFragmentManager(), "aboutDetail");
-            }
-            if (id == R.id.action_edit){
-                ((DetailFragment) mfragment).setEditable(true);
-            }
-
-            if (id == R.id.action_delete){
-                ((DetailFragment) mfragment).deleteGoal();
-            }
-
-        }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -350,7 +256,6 @@ public class DashBoardActivity extends AppCompatActivity
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(NAV_ITEM_ID, mNavItemId);
-        outState.putInt(MENU_ID, menuLayout);
     }
 
 }

@@ -1,16 +1,23 @@
 package com.seantholcomb.goalgetter;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -49,9 +56,48 @@ public class FocusTimerFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.focus_timer, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.action_about){
+            DialogFragment newFragment = new DialogFragment(){
+                @Override
+                public Dialog onCreateDialog (Bundle savedInstanceState){
+                    LayoutInflater inflater = getActivity().getLayoutInflater();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setView(inflater.inflate(R.layout.dialog_about_focus_timer, null));
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Nothing needed here
+                        }
+                    });
+
+                    return builder.create();
+                }
+            };
+
+            newFragment.show(getActivity().getSupportFragmentManager(), "aboutFocus");
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().setTitle(getString(R.string.title_section3));
         vibrator = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         ringtoneManager = new RingtoneManager(getActivity());
         mCursor = ringtoneManager.getCursor();
