@@ -1,7 +1,5 @@
 package com.seantholcomb.goalgetter;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -157,7 +155,6 @@ public class Utility {
                    returnString = returnString + "99";
             }
         }
-        Log.e("JJJ", returnString + " from " + id);
         return returnString;
     }
 

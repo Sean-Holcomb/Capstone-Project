@@ -15,20 +15,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.Calendar;
 
 
 //todo remove depricated methods
+//Todo softkeyboard closes when not in use
 //todo setting returns properly
-//todo clean up code
 //todo make ui nicer
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -49,13 +51,16 @@ public class DashBoardActivity extends AppCompatActivity
 
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
-    private InterstitialAd mInterstitialAd;
+    //private InterstitialAd mInterstitialAd;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -107,14 +112,14 @@ public class DashBoardActivity extends AppCompatActivity
         mAdView.loadAd(adRequest);
 
     }
-
+/*
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
-    }
+    }*/
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -179,6 +184,14 @@ public class DashBoardActivity extends AppCompatActivity
                 .commit();
         menuLayout= R.menu.detail;
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.
+                INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        return true;
     }
 
     public void restoreActionBar() {

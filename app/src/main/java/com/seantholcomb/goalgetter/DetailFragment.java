@@ -20,10 +20,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -150,6 +151,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -511,6 +514,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
+            if(dateView!=null){
+                double setDate = Utility.getDateDouble(dateView.getText().toString());
+                if (setDate != 0){
+                    c.setTimeInMillis((long) setDate);
+                }
+            }
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
