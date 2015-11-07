@@ -6,12 +6,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.seantholcomb.goalgetter.R;
 import com.seantholcomb.goalgetter.data.GoalContract;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by seanholcomb on 10/24/15.
@@ -55,12 +59,15 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
         @Override
         public RemoteViewsFactory onGetViewFactory(Intent intent) {
             return new RemoteViewsFactory() {
+                private ArrayList<String> mTodoArrayList;
 
                 private Cursor data = null;
 
                 @Override
                 public void onCreate() {
                     // Nothing to do
+                    mTodoArrayList = new ArrayList<String>();
+
                 }
 
                 @Override
@@ -80,7 +87,7 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                             null,
                             sortOrder);
                     if (data!=null) {
-
+                        makeValue(data);
 
                     }
                     Binder.restoreCallingIdentity(identityToken);
@@ -96,7 +103,8 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
 
                 @Override
                 public int getCount() {
-                    return data == null ? 0 : data.getCount();
+                    Log.e("GGG", ""+mTodoArrayList.size());
+                    return mTodoArrayList == null ? 0 : mTodoArrayList.size();
                 }
 
                 @Override
@@ -107,6 +115,7 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                             data == null || !data.moveToPosition(position)) {
                         return views;
                     }
+                    views.setTextViewText(R.id.todo_title, mTodoArrayList.get(position));
 
                     return views;
                 }
@@ -131,6 +140,54 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                 @Override
                 public boolean hasStableIds() {
                     return true;
+                }
+
+                public void makeValue(Cursor cursor) {
+                    mTodoArrayList.clear();
+                    for (int i = 0; i < cursor.getCount(); i++) {
+                        cursor.moveToPosition(i);
+                        if (cursor.getString(COL_TYPE).equals(GoalContract.GoalEntry.GOAL)
+                                || cursor.getInt(COL_FREQUENCY) == 0
+                                || checkOnTrack(cursor, i)){
+                            continue;
+                        }
+
+                        mTodoArrayList.add(cursor.getString(COL_TASK));
+
+                    }
+                    Log.e("RRR", ""+mTodoArrayList.size());
+                }
+
+                public boolean checkOnTrack(Cursor cursor, int position) {
+                    cursor.moveToPosition(position);
+                    Log.e("RRR", "check running");
+                    int done = cursor.getInt(COL_DONE_TASK);
+                    int missed = cursor.getInt(COL_MISSED_TASKS);
+                    double start = (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis());
+                    double end = cursor.getDouble(COL_DUE_DATE);
+                    int freq = cursor.getInt(COL_FREQUENCY);
+
+
+                    int total = cursor.getInt(COL_TOTAL_TASKS);
+
+                    double dif = end - start;
+                    dif = dif / (1000 * 60 * 60 * 24);
+                    dif = dif / 7 * freq;
+                    int difDays = (int) dif;
+                    difDays = total - done - missed - difDays;
+                    Log.e("FFF", done+"done");
+                    Log.e("FFF", total+"total");
+                    Log.e("FFF", difDays+"difdays");
+                    if (difDays >= 0) {
+                        Log.e("FFF", "Return false");
+                        return false;
+                    } else {
+                        Log.e("FFF", "Return true");
+                       return true;
+                    }
+
+
+
                 }
             };
         }

@@ -24,8 +24,10 @@ import java.util.Calendar;
 
 
 //Todo softkeyboard closes when not in use
+//touch event working now, try again
 //todo make ui nicer
 //todo widget ui too
+//widget intents and make sure list is showing properly now, it may be
 //todo add content descriptions
 //todo publish app
 //todo add fade transitions
