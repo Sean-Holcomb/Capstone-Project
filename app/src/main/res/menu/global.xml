@@ -1,3 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_item_dashboard"
+            android:title="@string/title_section1"/>
+        <item
+            android:id="@+id/drawer_item_detail"
+            android:title="@string/title_section2"/>
+        <item
+            android:id="@+id/drawer_item_focus"
+            android:title="@string/title_section3"/>
+        <item
+            android:id="@+id/drawer_item_settings"
+            android:title="@string/action_settings"/>
+    </group>
 </menu>

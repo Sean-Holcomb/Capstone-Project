@@ -52,7 +52,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
+//todo add loading spinner for saving
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String sDelete =
@@ -128,6 +128,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         Bundle args = getArguments();
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
         mCredential = GoogleAccountCredential.usingOAuth2(

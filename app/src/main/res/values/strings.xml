@@ -10,6 +10,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!--Menu Strings-->
+
     <string name="action_settings">Settings</string>
     <string name="about_focus">About Focus Timer</string>
     <string name="about_detial">About Goal Detail</string>

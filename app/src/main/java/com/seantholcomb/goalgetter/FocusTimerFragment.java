@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 //Todo stop alarm from going off when fragment opens
 //Todo save choosen alarm and open to it
-//Todo keep minutes selected alarm and active timer through life cycle changes.
+//Todo keep active timer through life cycle changes.
 public class FocusTimerFragment extends Fragment {
     private EditText minuteInput;
     private Button restartButton;
@@ -51,6 +51,7 @@ public class FocusTimerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         vibrator = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         ringtoneManager = new RingtoneManager(getActivity());
         mCursor = ringtoneManager.getCursor();

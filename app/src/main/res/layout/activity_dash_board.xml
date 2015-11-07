@@ -1,6 +1,7 @@
 <!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -42,13 +43,12 @@
              android:layout_gravity="left" instead. -->
         <!-- The drawer is given a fixed width in dp and extends the full height of
              the container. -->
-        <fragment
-            android:id="@+id/navigation_drawer"
-            android:name="com.seantholcomb.goalgetter.NavigationDrawerFragment"
-            android:layout_width="@dimen/navigation_drawer_width"
+        <android.support.design.widget.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            tools:layout="@layout/fragment_navigation_drawer" />
+            app:menu="@menu/global"/>
 
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

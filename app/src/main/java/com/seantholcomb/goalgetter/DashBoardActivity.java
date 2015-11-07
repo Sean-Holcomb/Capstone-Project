@@ -8,19 +8,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -28,30 +29,37 @@ import com.google.android.gms.ads.AdView;
 import java.util.Calendar;
 
 
-//todo remove depricated methods
+//todo move settings and titles to fragments
 //Todo softkeyboard closes when not in use
-//todo setting returns properly
 //todo make ui nicer
-public class DashBoardActivity extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        DashboardFragment.Callback, DetailFragment.Callback {
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+//todo widget ui too
+//todo add content descriptions
+//todo publish app
+//todo add fade transitions
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+public class DashBoardActivity extends AppCompatActivity
+        implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener  {
+
+
     private CharSequence mTitle;
     private int menuLayout;
     private Fragment mfragment;
+    SettingsFragment mSettingsFragment;
     private final String TITLE_KEY= "title";
     private final String DUE_DATE_KEY = "due_date";
+    private static final String NAV_ITEM_ID = "navItemId";
+    private static final String MENU_ID = "menuId";
+    private static final long DRAWER_CLOSE_DELAY_MS = 250;
 
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
     //private InterstitialAd mInterstitialAd;
+
+    private final Handler mDrawerActionHandler = new Handler();
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private int mNavItemId;
+    private Toolbar toolbar;
 
 
     @Override
@@ -59,17 +67,35 @@ public class DashBoardActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mTitle = getTitle();
+
+        mSettingsFragment = new SettingsFragment();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(mTitle);
         setSupportActionBar(toolbar);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-        menuLayout=R.menu.dash_board;
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        if (null == savedInstanceState) {
+            mNavItemId = R.id.drawer_item_dashboard;
+            menuLayout=R.menu.dash_board;
+        } else {
+            mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
+            menuLayout = savedInstanceState.getInt(MENU_ID);
+        }
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.getMenu().findItem(mNavItemId).setChecked(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+
+        if (savedInstanceState == null)
+        navigate(mNavItemId);
+
 
         //Set Alarm for database incrementation and notifications
         alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -112,6 +138,67 @@ public class DashBoardActivity extends AppCompatActivity
         mAdView.loadAd(adRequest);
 
     }
+
+    private void navigate(final int itemId) {
+
+        // update the main content by replacing fragments
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        getFragmentManager().beginTransaction().remove(mSettingsFragment).commit();
+        switch (itemId){
+
+
+            case R.id.drawer_item_detail:
+                mTitle = getString(R.string.title_section2);
+                menuLayout = R.menu.detail;
+                mfragment = new DetailFragment();
+                break;
+            case R.id.drawer_item_focus:
+                mfragment  = new FocusTimerFragment();
+                mTitle = getString(R.string.title_section3);
+                menuLayout = R.menu.focus_timer;
+                //if (mInterstitialAd.isLoaded()) {
+                //    mInterstitialAd.show();
+                //}
+                break;
+            case R.id.drawer_item_settings:
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.container, mSettingsFragment)
+                        .commit();
+
+                return;
+            default:
+                mTitle = getString(R.string.title_section1);
+                menuLayout = R.menu.dash_board;
+                mfragment= new DashboardFragment();
+
+        }
+        toolbar.setTitle(mTitle);
+        invalidateOptionsMenu();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, mfragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+        // update highlighted item in the navigation menu
+        menuItem.setChecked(true);
+        mNavItemId = menuItem.getItemId();
+
+        // allow some time after closing the drawer before performing real navigation
+        // so the user can see what is happening
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        mDrawerActionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                navigate(menuItem.getItemId());
+            }
+        }, DRAWER_CLOSE_DELAY_MS);
+        return true;
+    }
+
+
 /*
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
@@ -121,36 +208,7 @@ public class DashBoardActivity extends AppCompatActivity
         mInterstitialAd.loadAd(adRequest);
     }*/
 
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        switch (position){
-            case 1:
-                mTitle = getString(R.string.title_section2);
-                menuLayout = R.menu.detail;
-                mfragment = new DetailFragment();
-                break;
-            case 2:
-                mfragment  = new FocusTimerFragment();
-                mTitle = getString(R.string.title_section3);
-                menuLayout = R.menu.focus_timer;
-                //if (mInterstitialAd.isLoaded()) {
-                //    mInterstitialAd.show();
-                //}
-                break;
-            default:
-                mTitle = getString(R.string.title_section1);
-                menuLayout = R.menu.dash_board;
-                mfragment= new DashboardFragment();
-        }
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, mfragment)
-                .addToBackStack(null)
-                .commit();
-    }
 
     @Override
     public void onItemSelected(Uri uri, GoalAdapter.GoalAdapterViewHolder vh){
@@ -171,6 +229,7 @@ public class DashBoardActivity extends AppCompatActivity
                 .addToBackStack(null)
                 .commit();
         menuLayout= R.menu.detail;
+        mNavItemId = R.id.drawer_item_detail;
         invalidateOptionsMenu();
     }
 
@@ -186,34 +245,20 @@ public class DashBoardActivity extends AppCompatActivity
         invalidateOptionsMenu();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.
-                INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        return true;
-    }
 
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+    public void restoretoolar() {
+        //Toolbar toolbar = getSupportActionBar();
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        //toolbar.setDisplayShowTitleEnabled(true);
+        //toolbar.setTitle(mTitle);
 
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(menuLayout, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(menuLayout, menu);
+        return true;
     }
 
     @Override
@@ -223,6 +268,10 @@ public class DashBoardActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == android.support.v7.appcompat.R.id.home) {
+            toolbar.setTitle(R.string.app_name);
+            return mDrawerToggle.onOptionsItemSelected(item);
+        }
         if (menuLayout == R.menu.focus_timer){
             if (id == R.id.action_about){
                 DialogFragment newFragment = new DialogFragment(){
@@ -277,21 +326,31 @@ public class DashBoardActivity extends AppCompatActivity
 
         }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            getFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, new SettingsFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
 
         return super.onOptionsItemSelected(item);
     }
 
     public void openDrawer(){
-        if (mNavigationDrawerFragment != null){
-            mNavigationDrawerFragment.openDrawer();
+        if (mDrawerLayout != null){
+            mDrawerLayout.openDrawer(GravityCompat.START);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            invalidateOptionsMenu();
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(NAV_ITEM_ID, mNavItemId);
+        outState.putInt(MENU_ID, menuLayout);
     }
 
 }
