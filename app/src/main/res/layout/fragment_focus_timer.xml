@@ -4,6 +4,9 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:id="@+id/linear_focus_timer"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context="com.seantholcomb.goalgetter.FocusTimerFragment"
     >
     <LinearLayout
@@ -20,7 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:text="@string/zero"/>
+            android:text="@string/zero"
+            android:contentDescription="@string/cont_desc_minuteInput"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,6 +37,7 @@
         android:layout_height="wrap_content"
         android:text="@string/restart"
         android:background="@color/green"
+        android:contentDescription="@string/cont_desc_restartButton"
         />
     <Button
         android:id="@+id/stop"
@@ -40,6 +45,7 @@
         android:layout_height="wrap_content"
         android:text="@string/stop"
         android:background="@color/red"
+        android:contentDescription="@string/cont_desc_stopButton"
         />
 
     <TextView
@@ -50,7 +56,8 @@
         android:id="@+id/minuteOutput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/zero_timer" />
+        android:text="@string/zero_timer"
+        android:contentDescription="@string/cont_desc_minuteOutput"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +65,8 @@
     <Spinner
         android:id="@+id/alarmSelector"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/cont_desc_alarmSelector"/>
 
 
 

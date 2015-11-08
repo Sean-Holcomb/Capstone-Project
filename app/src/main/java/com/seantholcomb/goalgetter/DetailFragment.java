@@ -27,8 +27,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -255,9 +257,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 CVAL.add(0, GoalValue);
                 if (calendarActive) {
                     addEvents(CVAL);
-                } else if(hasCalendar){
+                } else if (hasCalendar) {
                     new MakeRequestTask(mCredential, CVAL).execute();
-                }else {
+                } else {
                     onSaveButton(CVAL);
                 }
 
@@ -324,6 +326,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void afterTextChanged(Editable s) {
 
+            }
+        });
+
+        rootView.findViewById(R.id.linear_detail).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.
+                        INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                return true;
             }
         });
 

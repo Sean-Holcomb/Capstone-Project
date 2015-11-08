@@ -3,12 +3,14 @@ package com.seantholcomb.goalgetter;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -18,8 +20,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,8 +31,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-//Todo stop alarm from going off when fragment opens
-//Todo save choosen alarm and open to it
 //Todo keep active timer through life cycle changes.
 public class FocusTimerFragment extends Fragment {
     private EditText minuteInput;
@@ -49,6 +51,10 @@ public class FocusTimerFragment extends Fragment {
     private RingtoneManager ringtoneManager;
     private Cursor mCursor;
     private Ringtone mRingtone;
+    private SharedPreferences settings;
+    private final String RINGTONE_KEY= "ringtone_key";
+    private int ringerPosition;
+    private boolean ring;
 
 
     public FocusTimerFragment() {
@@ -101,6 +107,9 @@ public class FocusTimerFragment extends Fragment {
         vibrator = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         ringtoneManager = new RingtoneManager(getActivity());
         mCursor = ringtoneManager.getCursor();
+        settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        ring= false;
+
 
 
     }
@@ -109,6 +118,15 @@ public class FocusTimerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        final SharedPreferences.Editor editor= settings.edit();
+        if(settings.contains(RINGTONE_KEY)){
+            ringerPosition = settings.getInt(RINGTONE_KEY, 0);
+        }else{
+            editor.putInt(RINGTONE_KEY, 0).apply();
+            ringerPosition = 0;
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_focus_timer, container, false);
         minuteInput = (EditText) rootView.findViewById(R.id.minuteInput);
         restartButton = (Button) rootView.findViewById(R.id.restart);
@@ -124,11 +142,18 @@ public class FocusTimerFragment extends Fragment {
                 0);
         sca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         alarmPicker.setAdapter(sca);
+        alarmPicker.setSelection(ringerPosition);
         alarmPicker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mRingtone = ringtoneManager.getRingtone(position);
-                mRingtone.play();
+                editor.putInt(RINGTONE_KEY, position).commit();
+                if (ring) {
+                    mRingtone.play();
+                }else{
+                    ring=true;
+                }
+
             }
 
             @Override
@@ -140,10 +165,10 @@ public class FocusTimerFragment extends Fragment {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mRingtone.isPlaying()){
+                if (mRingtone.isPlaying()) {
                     mRingtone.stop();
                 }
-                if (countDownTimer != null){
+                if (countDownTimer != null) {
                     countDownTimer.cancel();
                     vibrator.cancel();
                     displayTime();
@@ -209,6 +234,16 @@ public class FocusTimerFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
+            }
+        });
+
+        rootView.findViewById(R.id.linear_focus_timer).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.
+                        INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                return true;
             }
         });
 

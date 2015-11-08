@@ -42,6 +42,7 @@
     <string name="title_prompt">New Goal</string>
     <string name="date_prompt">Please select a later date</string>
     <string name="adapter_date_prompt">Please select an earlier date</string>
+    <string name="concurrent">Start Milestone Now</string>
 
     <!--Focus Timer Strings -->
     <string name="time_for">Time For</string>
@@ -74,6 +75,30 @@
     <!--Preference Strings-->
     <string name="pref_noti_key">notification_key</string>
     <string name="pref_noti_title">Turn On Notifications</string>
+
+    <!--Content Descriptions-->
+    <string name="cont_desc_toolbar">Toolbar to control navigation and app actions</string>
+    <string name="cont_desc_minuteInput">Set the number of minutes you would like to focus, between 0 and 90</string>
+    <string name="cont_desc_restartButton">cancel and restart the timer</string>
+    <string name="cont_desc_stopButton">stop the timer if you lose focus or stop alarm</string>
+    <string name="cont_desc_minuteOutput">displays timer after stop button is pressed or after timer finishes</string>
+    <string name="cont_desc_alarmSelector">Choose the alarm you would like to play when you the timer finishes</string>
+    <string name="cont_desc_save">Save changes to goal</string>
+    <string name="cont_desc_cancel">Undo changes and turn off edit mode</string>
+    <string name="cont_desc_title">Set the title of your goal</string>
+    <string name="cont_desc_dateSetter">Pick the date you would like to finish on</string>
+    <string name="cont_desc_calendarBox">Check box if you would like goal and milestone to show up on your google calendar</string>
+    <string name="cont_desc_addMilestone">add an additional milestone to your goal</string>
+    <string name="cont_desc_graphs">Progress on your goals and milestones</string>
+    <string name="cont_desc_milestones">Details on each milestone for the goal</string>
+    <string name="cont_desc_todoView">Current tasks to complete</string>
+    <string name="cont_desc_graphBar">the green bar represents completed tasks while the red bar represents missed tasks</string>
+    <string name="cont_desc_todoBox">checkbox when you have completed this task</string>
+    <string name="cont_desc_milestone_title">Set the title of this milestone</string>
+    <string name="cont_desc_todoTask">Set the task needed to achieve your milestone</string>
+    <string name="cont_desc_freq">Number of day you want to do the task per week</string>
+    <string name="cont_desc_concurrent">Check if you would like to work towards a milestone at the same time as others in this goal</string>
+    <string name="cont_desc_delete_milestone">remove this milestone from the goal</string>
 
 
 </resources>

@@ -8,7 +8,8 @@
         android:id="@+id/milestone_title"
         android:inputType="text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/cont_desc_milestone_title"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,7 +19,8 @@
         android:id="@+id/milesstone_duedate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:editable="false"/>
+        android:editable="false"
+        android:contentDescription="@string/cont_desc_dateSetter"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -28,24 +30,29 @@
         android:inputType="text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/cont_desc_todoTask"
          />
     <EditText
         android:id="@+id/frequency"
         android:inputType="number"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/cont_desc_freq"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/a_week"/>
     <CheckBox
+        android:text="@string/concurrent"
         android:id="@+id/concurrent"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:contentDescription="@string/cont_desc_concurrent"/>
     <Button
         android:id="@+id/delete_milestone"
         android:text="@string/delete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/cont_desc_delete_milestone"/>
 
 </LinearLayout>

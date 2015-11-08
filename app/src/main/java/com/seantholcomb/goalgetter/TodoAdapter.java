@@ -123,7 +123,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterVie
                         goal,
                         sUpdateGoalSelection,
                         new String[]{GoalContract.GoalEntry.GOAL,  id});
-
             }
         });
     }

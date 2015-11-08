@@ -19,7 +19,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/todo_list"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:contentDescription="@string/cont_desc_todoView"/>
 
         <TextView
             android:id="@+id/current_label"
@@ -30,7 +31,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/current_list"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:contentDescription="@string/cont_desc_graphs"/>
 
         <TextView
             android:id="@+id/past_label"
@@ -41,7 +43,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/past_list"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:contentDescription="@string/cont_desc_graphs"/>
 
     </LinearLayout>
 

@@ -1,6 +1,5 @@
 package com.seantholcomb.goalgetter;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,17 +9,14 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
 
 
-public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnTouchListener {
+public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
 
     private GoalAdapter mGoalAdapter;
@@ -118,27 +114,11 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         mCurrentList.setAdapter(mGoalAdapter);
         mPastList.setAdapter(mPastAdapter);
         mTodoList.setAdapter(mTodoAdapter);
-        rootView.setOnTouchListener(this);
-        rootView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.e("RRR", "touch event");
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.
-                        INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(container.getWindowToken(), 0);
-                return true;
-            }
-        });
+
         return rootView;
     }
 
-    @Override
-    public boolean onTouch(View view, MotionEvent event){
-        Log.e("RRR", "touch event");
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.
-                INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        return true;
-    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

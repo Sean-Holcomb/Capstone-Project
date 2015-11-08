@@ -17,25 +17,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.Calendar;
 
 
-//Todo softkeyboard closes when not in use
-//touch event working now, try again
 //todo make ui nicer
-//todo widget ui too
-//widget intents and make sure list is showing properly now, it may be
 //todo add content descriptions
 //todo publish app
 //todo add fade transitions
 //todo add about texts
 
 public class DashBoardActivity extends AppCompatActivity
-        implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener  {
-
+        implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener{
 
 
 
@@ -48,7 +45,7 @@ public class DashBoardActivity extends AppCompatActivity
 
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
-    //private InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAd;
 
     private final Handler mDrawerActionHandler = new Handler();
     private DrawerLayout mDrawerLayout;
@@ -109,23 +106,18 @@ public class DashBoardActivity extends AppCompatActivity
                 AlarmManager.INTERVAL_DAY,
                 alarmIntent);
 
-        //todo fix interstitial ad
+
         //admob ad setup
-        //mInterstitialAd = new InterstitialAd(this);
-        //mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
-/*
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
-                mfragment  = new FocusTimerFragment();
-                mTitle = getString(R.string.title_section3);
-                menuLayout = R.menu.focus_timer;
-
+                requestNewInterstitial();
             }
         });
 
-        //requestNewInterstitial();
-*/
+        requestNewInterstitial();
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -149,9 +141,9 @@ public class DashBoardActivity extends AppCompatActivity
                 break;
             case R.id.drawer_item_focus:
                 fragment  = new FocusTimerFragment();
-                //if (mInterstitialAd.isLoaded()) {
-                //    mInterstitialAd.show();
-                //}
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                }
                 break;
             case R.id.drawer_item_settings:
                 getFragmentManager().beginTransaction()
@@ -164,11 +156,14 @@ public class DashBoardActivity extends AppCompatActivity
                 fragment= new DashboardFragment();
 
         }
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
+
+
 
     @Override
     public boolean onNavigationItemSelected(final MenuItem menuItem) {
@@ -189,14 +184,14 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-/*
+
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
-    }*/
+    }
 
 
 

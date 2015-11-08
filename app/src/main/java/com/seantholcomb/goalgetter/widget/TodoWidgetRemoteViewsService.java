@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -103,7 +102,6 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
 
                 @Override
                 public int getCount() {
-                    Log.e("GGG", ""+mTodoArrayList.size());
                     return mTodoArrayList == null ? 0 : mTodoArrayList.size();
                 }
 
@@ -155,12 +153,10 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                         mTodoArrayList.add(cursor.getString(COL_TASK));
 
                     }
-                    Log.e("RRR", ""+mTodoArrayList.size());
                 }
 
                 public boolean checkOnTrack(Cursor cursor, int position) {
                     cursor.moveToPosition(position);
-                    Log.e("RRR", "check running");
                     int done = cursor.getInt(COL_DONE_TASK);
                     int missed = cursor.getInt(COL_MISSED_TASKS);
                     double start = (double) GoalContract.normalizeDate(Calendar.getInstance().getTimeInMillis());
@@ -175,14 +171,9 @@ public class TodoWidgetRemoteViewsService extends RemoteViewsService {
                     dif = dif / 7 * freq;
                     int difDays = (int) dif;
                     difDays = total - done - missed - difDays;
-                    Log.e("FFF", done+"done");
-                    Log.e("FFF", total+"total");
-                    Log.e("FFF", difDays+"difdays");
                     if (difDays >= 0) {
-                        Log.e("FFF", "Return false");
                         return false;
                     } else {
-                        Log.e("FFF", "Return true");
                        return true;
                     }
 
