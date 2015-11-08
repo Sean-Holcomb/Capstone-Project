@@ -22,7 +22,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -370,7 +369,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 duedateView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DialogFragment newFragment = new DatePickerFragment(v);
+                        DialogFragment newFragment = new DatePickerFragment();
+                        ((DatePickerFragment) newFragment).setView(v);
                         newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
 
                     }
@@ -564,8 +564,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             super();
         }
 
-        public DatePickerFragment(View v) {
-            super();
+
+
+        public void setView(View v){
             dateView = (EditText) v;
         }
 

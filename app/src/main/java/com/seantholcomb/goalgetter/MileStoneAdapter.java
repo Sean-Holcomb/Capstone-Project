@@ -228,7 +228,8 @@ public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.Mile
         milestoneAdapterViewHolder.dueDateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new DetailFragment.DatePickerFragment(v);
+                DialogFragment newFragment = new DetailFragment.DatePickerFragment();
+                ((DetailFragment.DatePickerFragment) newFragment).setView(v);
                 newFragment.show(((FragmentActivity) mContext).getSupportFragmentManager(), "datePicker");
             }
         });
