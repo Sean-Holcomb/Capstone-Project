@@ -32,6 +32,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 //Todo keep active timer through life cycle changes.
+
+/**
+ * Fragment that allows user to time focus sessions and rings an alarm on completion
+ */
 public class FocusTimerFragment extends Fragment {
     private EditText minuteInput;
     private Button restartButton;
@@ -61,12 +65,22 @@ public class FocusTimerFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * set menu for fragment
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.focus_timer, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * displays about dialog
+     * @param item which item was selected
+     * @return true to register event
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -99,6 +113,10 @@ public class FocusTimerFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * initialize vibrator and ringtoneManager
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +132,13 @@ public class FocusTimerFragment extends Fragment {
 
     }
 
-
+    /**
+     * set views to display
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return view to display
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -134,6 +158,7 @@ public class FocusTimerFragment extends Fragment {
         alarmPicker = (Spinner) rootView.findViewById(R.id.alarmSelector);
         minuteOutput = (TextView) rootView.findViewById(R.id.minuteOutput);
 
+        //adapter for ringtone selector
         SimpleCursorAdapter sca=new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_item,
                 mCursor,
@@ -143,11 +168,13 @@ public class FocusTimerFragment extends Fragment {
         sca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         alarmPicker.setAdapter(sca);
         alarmPicker.setSelection(ringerPosition);
+        //sets and saves ringtone to be played
         alarmPicker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mRingtone = ringtoneManager.getRingtone(position);
                 editor.putInt(RINGTONE_KEY, position).commit();
+                //prevent ringtone from playing when fragment is started
                 if (ring) {
                     mRingtone.play();
                 }else{
@@ -161,7 +188,7 @@ public class FocusTimerFragment extends Fragment {
 
             }
         });
-
+        //stops ringtone, vibration and timer. displays current timer ime
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,6 +205,7 @@ public class FocusTimerFragment extends Fragment {
             }
         });
 
+        //stops ringtone and vibrator, restarts timer
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,6 +215,7 @@ public class FocusTimerFragment extends Fragment {
                 }
 
                 if (mMinutes !=0) {
+                    //start timer
                     countDownTimer = new CountDownTimer(mMillis, 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
@@ -211,6 +240,7 @@ public class FocusTimerFragment extends Fragment {
             }
         });
 
+        //records number of minutes timer should go
         minuteInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -237,6 +267,7 @@ public class FocusTimerFragment extends Fragment {
             }
         });
 
+        //close keyboard when other parts f fragment are touched
         rootView.findViewById(R.id.linear_focus_timer).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -250,7 +281,9 @@ public class FocusTimerFragment extends Fragment {
         return rootView;
     }
 
-
+    /**
+     * format time and display it in the minuteoutput
+     */
     private void displayTime(){
         int secs = (int) (mTimerCount / 1000);
         int mins = secs / 60;

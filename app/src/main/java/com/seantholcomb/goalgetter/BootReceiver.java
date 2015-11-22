@@ -10,6 +10,7 @@ import java.util.Calendar;
 
 /**
  * Created by seanholcomb on 10/24/15.
+ * Broadcast receiver to catch boot events and set alarm for the GoalAlarm intent service
  */
 public class BootReceiver extends BroadcastReceiver{
     private AlarmManager alarmMgr;

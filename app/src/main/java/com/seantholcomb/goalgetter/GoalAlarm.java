@@ -22,8 +22,8 @@ import java.util.Calendar;
 
 /**
  * Created by seanholcomb on 10/24/15.
- * This Class is use to update the database and generate notifications
- * It should run daily at midnight.
+ * This Class is used to update the database and generate notifications
+ * It is run daily at midnight be an alarm.
  */
 public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompleteListener<Cursor> {
 
@@ -76,6 +76,10 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
         super("GoalAlarm");
     }
 
+    /**
+     * Start loaders to get full database
+     * @param intent sent by AlarmReceiver
+     */
     @Override
     public void onHandleIntent(Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -88,6 +92,11 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     }
 
+    /**
+     * run methods when db is availible
+     * @param loader
+     * @param data db
+     */
     @Override
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
         makeValue(data);
@@ -99,7 +108,9 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     }
 
-
+    /**
+     * sends notifications about tasks and completed milestones/goals
+     */
     private void sendNotification() {
 
         NotificationCompat.Builder mBuilder;
@@ -123,7 +134,7 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
             if (notificationsEnabled && mCVArrayList.get(i).getAsLong(GoalContract.GoalEntry.COLUMN_DUE_DATE) <= calendar.getTimeInMillis()
                     && !mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
                 mCVArrayList.get(i).put(GoalContract.GoalEntry.COLUMN_STATUS, GoalContract.GoalEntry.COMPLETE);
-
+                //create unique id for each notification
                 String name = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_NAME);
                 String idString = Utility.makeValidId(name);
                 if (idString.length()>9){
@@ -150,6 +161,7 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
                     && mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TYPE).equals(GoalContract.GoalEntry.MILESTONE)) {
                 showNotification = checkOnTrack(i);
                 if (notificationsEnabled && showNotification) {
+                    //create unique id for notifications
                     String task = mCVArrayList.get(i).getAsString(GoalContract.GoalEntry.COLUMN_TASK);
                     String idString = Utility.makeValidId(task);
                     if (idString.length()>9){
@@ -175,13 +187,15 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     }
 
+    /**
+     * updates goals task fields to be equal to the sum of its milestones respective fields
+     */
     private void updateTasks() {
         String id;
         int remaining;
         int done;
         int missed;
         int goalIndex;
-
         for (int i = 0; i < mIdArrayList.size(); i++) {
             id = mIdArrayList.get(i);
             goalIndex = -1;
@@ -212,7 +226,9 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
         this.getContentResolver().bulkInsert(GoalContract.GoalEntry.GOAL_URI, CVArray);
     }
 
-    //This method will delete milestones that are not associated with a Goal
+    /**
+     * This method will delete milestones that are not associated with a Goal
+     */
     private void deleteStrayMilestones() {
 
         for (int i = 0; i < mCVArrayList.size(); i++) {
@@ -232,6 +248,14 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
         }
     }
 
+    /**
+     * If a milestone is active. Algorithm checks amount of tasks complete against
+     * those it calculates to be remaining.
+     * if the remaining amount cant be completed at the rate specified by the frequency
+     * then a task is marked as missed
+     * @param position
+     * @return
+     */
     public boolean checkOnTrack(int position) {
         int done = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_DONE);
         int missed = (int) mCVArrayList.get(position).get(GoalContract.GoalEntry.COLUMN_TASKS_MISSED);
@@ -266,6 +290,10 @@ public class GoalAlarm extends IntentService implements CursorLoader.OnLoadCompl
 
     }
 
+    /**
+     * populates arraylists from cursor
+     * @param cursor database
+     */
     public void makeValue(Cursor cursor) {
         mIdArrayList.clear();
         mCVArrayList.clear();

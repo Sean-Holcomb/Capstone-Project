@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * Static methods for use in other classes
  * Created by seanholcomb on 10/9/15.
  */
 public class Utility {
@@ -41,6 +42,11 @@ public class Utility {
         return percents;
     }
 
+    /**
+     * make a formatted string from milliseconds
+     * @param milliSeconds date in milliseconds
+     * @return formatted date string
+     */
     public static String getDate(long milliSeconds)
     {
         // Create a DateFormatter object for displaying date in specified format.
@@ -52,6 +58,11 @@ public class Utility {
         return formatter.format(calendar.getTime());
     }
 
+    /**
+     * turn formatted string into milliseconds
+     * @param formattedDate formatted date string
+     * @return date in milliseconds
+     */
     public static Double getDateDouble(String formattedDate)
     {
         // Create a DateFormatter object for displaying date in specified format.
@@ -67,6 +78,11 @@ public class Utility {
 
     }
 
+    /**
+     * Changes alphabetic string to numerals for notification ids
+     * @param id string to be turned into a numeral value
+     * @return numeral value that can be converted to a long
+     */
     public static String makeValidId(String id){
         id = id.toLowerCase();
         String returnString = "";

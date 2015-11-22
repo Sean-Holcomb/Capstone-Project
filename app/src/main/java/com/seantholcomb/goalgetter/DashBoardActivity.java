@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -26,11 +25,14 @@ import java.util.Calendar;
 
 
 //todo make ui nicer
-//todo add content descriptions
-//todo publish app
 //todo add fade transitions
 //todo add about texts
 
+/**
+ * Main Activity for application.
+ * All fragments are displayed form here using the fragment manager.
+ * Used for navigation and displaying ads
+ */
 public class DashBoardActivity extends AppCompatActivity
         implements DashboardFragment.Callback, DetailFragment.Callback,NavigationView.OnNavigationItemSelectedListener{
 
@@ -53,7 +55,13 @@ public class DashBoardActivity extends AppCompatActivity
     private int mNavItemId;
     private Toolbar toolbar;
 
-
+    /**
+     * method called when DashBoardActivity is created
+     * initializes navigation drawer
+     * sets alarm for GoalAlarm intent service
+     * loads and displays ads
+     * @param savedInstanceState bundle for restoring activity incase of lifecycle interuptions
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +135,10 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
+    /**
+     * displays fragment that corresponds to navigation drawer item that was selected
+     * @param itemId
+     */
     private void navigate(final int itemId) {
 
         // update the main content by replacing fragments
@@ -164,7 +176,12 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-
+    /**
+     * NavigationDrawer Callback method
+     * closes drawer when item is selected and runs navigate(int)
+     * @param menuItem the item selected by the user
+     * @return boolean, true to register navigation event
+     */
     @Override
     public boolean onNavigationItemSelected(final MenuItem menuItem) {
         // update highlighted item in the navigation menu
@@ -184,7 +201,9 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-
+    /**
+     * loads a new interstitial ad
+     */
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
@@ -194,9 +213,13 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-
+    /**
+     * Callback from DashBoardFragment
+     * launches detail fragment of selected item
+     * @param vh the selected viewholder form the Goal Adapter
+     */
     @Override
-    public void onItemSelected(Uri uri, GoalAdapter.GoalAdapterViewHolder vh){
+    public void onItemSelected(GoalAdapter.GoalAdapterViewHolder vh){
         Bundle args = new Bundle();
         if (vh != null) {
             String title = String.valueOf(vh.mTitleView.getText());
@@ -215,6 +238,11 @@ public class DashBoardActivity extends AppCompatActivity
         mNavItemId = R.id.drawer_item_detail;
     }
 
+    /**
+     * Callback from DetailFragment
+     * Resets detail fragment after save button is pressed
+     * @param args bundle containing name and due date of fragment
+     */
     @Override
     public void onSave(Bundle args){
         Fragment fragment = new DetailFragment();
@@ -225,6 +253,11 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
+    /**
+     * method called when options itemis selected
+     * @param item which item was selected from the options menu
+     * @return true to register event
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -237,12 +270,18 @@ public class DashBoardActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * open navigation drawer
+     */
     public void openDrawer(){
         if (mDrawerLayout != null){
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
+    /**
+     * closes navigation when back is pressed while it is open
+     */
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -253,6 +292,10 @@ public class DashBoardActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * saves position of navigation drawer on lifecycle interuptions
+     * @param outState bundle containing information to restore activity
+     */
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);

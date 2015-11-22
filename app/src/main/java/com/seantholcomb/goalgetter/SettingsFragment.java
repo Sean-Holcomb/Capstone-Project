@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
 /**
+ * fragment for setting notification settings
  * Created by seanholcomb on 11/5/15.
  */
 public class SettingsFragment extends PreferenceFragment {

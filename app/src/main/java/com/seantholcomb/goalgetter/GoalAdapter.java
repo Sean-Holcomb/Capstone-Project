@@ -3,7 +3,6 @@ package com.seantholcomb.goalgetter;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import java.util.Calendar;
 
 /**
  * Created by seanholcomb on 10/9/15.
+ * RecyclerView Adapter to display progress in a goal or milestone from a cursor
  */
 public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterViewHolder> {
 
@@ -52,6 +52,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
             view.setOnClickListener(this);
         }
 
+        //open detail fragment for selected goal
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
@@ -63,7 +64,8 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         }
     }
 
-    public static interface GoalAdapterOnClickHandler {
+    //Callback to dashboard fragment
+    public  interface GoalAdapterOnClickHandler {
         void onClick(String id, GoalAdapterViewHolder vh);
     }
 
@@ -74,7 +76,12 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
 
     }
 
-
+    /**
+     * creats new viewHolder
+     * @param viewGroup
+     * @param viewType
+     * @return
+     */
     @Override
     public GoalAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if ( viewGroup instanceof RecyclerView ) {
@@ -87,6 +94,12 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         }
     }
 
+    /**
+     * Add content to viewholder from cursor
+     * calculate and set bar length to represent amount of goal or milestone that is completed
+     * @param goalAdapterViewHolder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(GoalAdapterViewHolder goalAdapterViewHolder, int position) {
         mCursor.moveToPosition(position);
@@ -101,6 +114,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         int[] percents =Utility.getPercents(total_tasks,tasks_done,tasks_missed);
         goalAdapterViewHolder.mPercentView.setText(percents[0]+"%");
         goalAdapterViewHolder.mMinusPercentView.setText("-" + percents[1] + "%");
+        //leave no middle space on complete goals and set green bar to gold
         if (mCursor.getString(DashboardFragment.COL_STATUS).equals(GoalContract.GoalEntry.COMPLETE)) {
             goalAdapterViewHolder.mGreenBar.setBackgroundColor(mContext.getResources().getColor(R.color.gold));
             percents[0]=percents[0]+percents[2];
@@ -113,6 +127,13 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
 
 
     }
+
+    /**
+     * check for is past its duedate
+     * if it is not already set as complete it updates the database
+     * @param goalAdapterViewHolder
+     * @param position
+     */
     public void checkDueDate(GoalAdapterViewHolder goalAdapterViewHolder, int position ){
         mCursor.moveToPosition(position);
         if (goalAdapterViewHolder.due_date
@@ -141,6 +162,11 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         }
     }
 
+    /**
+     * sets weight of bars in viewholder so that they match percentages
+     * @param view bar view
+     * @param weight percentage
+     */
     public void setBarWeight(View view, int weight){
         LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) view.getLayoutParams();
 
@@ -148,21 +174,16 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         view.setLayoutParams(linearParams);
     }
 
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        //mICM.onRestoreInstanceState(savedInstanceState);
-    }
-
-    public void onSaveInstanceState(Bundle outState) {
-        //mICM.onSaveInstanceState(outState);
-    }
-
-
-
+    //only one type
     @Override
     public int getItemViewType(int position) {
         return position;
     }
 
+    /**
+     * used to populate recycler view
+     * @return number of items in cursor
+     */
     @Override
     public int getItemCount() {
         if ( null == mCursor ) {
@@ -171,11 +192,16 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalAdapterVie
         return mCursor.getCount();
     }
 
+    /**
+     * used to add data
+     * @param newCursor the data
+     */
     public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
         //mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
+
 
     public Cursor getCursor() {
         return mCursor;

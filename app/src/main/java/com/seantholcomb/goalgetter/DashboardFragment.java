@@ -15,7 +15,11 @@ import android.view.ViewGroup;
 
 import com.seantholcomb.goalgetter.data.GoalContract;
 
-
+/**
+ * Fragment for displaying information about the user's current goals
+ * displays three recycler views. One with a to-do list of tasks to do that day
+ * and two displaying current and past goals progress using GoalAdapters
+ */
 public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
 
@@ -61,8 +65,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     final int PAST_LOADER = 1;
     final int TODO_LOADER = 2;
 
+    //Interface for when a goalAdapter item is selected
     public interface Callback {
-        public void onItemSelected(Uri GoalUri, GoalAdapter.GoalAdapterViewHolder vh);
+        void onItemSelected(GoalAdapter.GoalAdapterViewHolder vh);
     }
 
 
@@ -70,6 +75,11 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         // Required empty public constructor
     }
 
+    /**
+     * called when fragment is created
+     * starts three loader to get content for recycler views
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +88,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(PAST_LOADER, null, this);
         getLoaderManager().initLoader(TODO_LOADER, null, this);
     }
-
+    /**
+     * Initialize and set listeners and adapters for views
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -90,23 +102,19 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         mPastList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mTodoList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        //selecting items opens detail fragment
         mGoalAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
             @Override
             public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
-                ((Callback) getActivity())
-                        .onItemSelected(GoalContract.GoalEntry.GOAL_URI,
-                                vh
-                        );
+                ((Callback) getActivity()).onItemSelected(vh);
             }
         });
 
+        //selecting items opens detail fragment
         mPastAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
             @Override
             public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
-                ((Callback) getActivity())
-                        .onItemSelected(GoalContract.GoalEntry.GOAL_URI,
-                                vh
-                        );
+                ((Callback) getActivity()).onItemSelected(vh);
             }
         });
 
@@ -119,13 +127,18 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
-
+    /**
+     * Chooses correct uri and starts loader
+     * @param id selects which kind of cursor will be returned should be: CURRENT_LOADER, PAST_LOADER or TODO_LOADER
+     * @param bundle
+     * @return returns cursor loader with proper URI for the content provider
+     */
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
         String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
         Uri goalUri;
-        switch (i) {
+        switch (id) {
             case CURRENT_LOADER:
                 goalUri = GoalContract.GoalEntry.CURRENT_URI;
                 break;
@@ -148,6 +161,11 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
                 sortOrder);
     }
 
+    /**
+     * applies cursor to the appropriate adapter
+     * @param loader of the cursor
+     * @param data the data to be displayed by the adapter
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         int id = loader.getId();
@@ -168,7 +186,9 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
 
     }
 
-
+    /**
+     * remove on scroll listeners from recyclerviews
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -179,6 +199,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
         }
     }
 
+    //required method for loader call backs
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //mGoalAdapter.swapCursor(null);

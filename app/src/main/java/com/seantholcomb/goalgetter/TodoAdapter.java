@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
+ * Adapter to populate to-do recyclerView in DashBoardFragment
  * Created by seanholcomb on 10/11/15.
  */
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoAdapterViewHolder> {

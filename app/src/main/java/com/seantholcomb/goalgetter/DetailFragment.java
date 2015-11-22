@@ -58,6 +58,15 @@ import java.util.Date;
 import java.util.List;
 
 //todo add loading spinner for saving
+
+/**
+ * Fragment that displays details of a goal and its milestones and allows them to edit them
+ * fragment has two states editable and uneditable
+ * when editable the fragment displays save and cancel buttons at the top
+ * and all fields can be changed along with the ability to add milestones
+ *
+ * when uneditable, buttons and checkboxes are hidden and fields are locked
+ */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String sDelete =
@@ -125,17 +134,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public DetailFragment() {
         // Required empty public constructor
     }
-
+    //callback used to reset fragment
     public interface Callback {
-        public void onSave(Bundle args);
+        void onSave(Bundle args);
     }
 
+    //inflate menu for fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.detail, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * Control opperations when an menu item is selected
+     * @param item which item was selected
+     * @return return true to register click event
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -171,6 +186,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * run on create checks for google credentials
+     * Checks if it is a new goal
+     * if it not, starts loader to get data for recycler views
+     * else it leaves fields empty and turns on editing
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,7 +211,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             dateString = Utility.getDate((long) dateDouble);
             GoalValue = newGoal();
             getLoaderManager().initLoader(0, args, this);
+            //checks for a google calendar
             hasCalendar = settings.contains(Utility.makeValidId(titleString));
+            //boolean to checkcalendar box
             calendarActive = hasCalendar;
         } else {
             isNew = true;
@@ -201,7 +225,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-
+    /**
+     * Initalize views set listener and adapters
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return view to be displayed
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -222,6 +252,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         mMilestoneGraph.setLayoutManager(new LinearLayoutManager(getActivity()));
         mMilestoneList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
         mGoalAdapter = new GoalAdapter(getActivity(), new GoalAdapter.GoalAdapterOnClickHandler() {
             @Override
             public void onClick(String id, GoalAdapter.GoalAdapterViewHolder vh) {
@@ -229,11 +261,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+
         mMilestoneAdapter = new MilestoneAdapter(getActivity());
         if (!isNew) {
             mMilestoneAdapter.setmID(titleString);
             mMilestoneAdapter.setDueDate(Utility.getDateDouble(dateString));
         }
+        //toggle option to add goal and milestones to google calendar
         addCalendar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -248,6 +282,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         });
         addCalendar.setChecked(calendarActive);
 
+        //arranges data, update database and creates or updates calendar
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -265,6 +300,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        //turn of editmode and revert data fields
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,6 +314,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        //adds a new milestone to the top of the milestone recycler view
         addMilestoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -285,6 +322,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        //sets title for fragment and id for milestone adapter items
         titleView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -304,6 +342,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        //set goal due date and maximum due date for milestones in the milestone adapter
         duedateView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -328,6 +367,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
+        //hide keyboard when touch elsewhere on the screen
         rootView.findViewById(R.id.linear_detail).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -345,6 +385,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return rootView;
     }
 
+    /**
+     * started by save button
+     * deletes old goal data
+     * converts arraylist to array
+     * saves new data to database
+     * restarts fragment
+     * @param CVAL list of content values to be update database
+     */
     public void onSaveButton(ArrayList<ContentValues> CVAL) {
         isNew = false;
         getContext().getContentResolver().delete(GoalContract.GoalEntry.GOAL_URI, sDelete, new String[]{titleString});
@@ -359,12 +407,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ((Callback) getActivity()).onSave(args);
     }
 
+    /**
+     * set visiblity and editablity of items for edit mode
+     * @param editable wheather or not fragment should be editable
+     */
     public void setEditable(Boolean editable) {
         if (editable) {
             cancelButton.setVisibility(View.VISIBLE);
             saveButton.setVisibility(View.VISIBLE);
             addMilestoneButton.setVisibility(View.VISIBLE);
             addCalendar.setVisibility(View.VISIBLE);
+            //launch date picker dialog
             if (!duedateView.hasOnClickListeners()) {
                 duedateView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -389,6 +442,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
 
+    /**
+     * Deletes goal from database and restarts fragment
+     */
     public void deleteGoal() {
         if (hasCalendar){
            new MakeRequestTask(mCredential).execute();
@@ -399,7 +455,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ((Callback) getActivity()).onSave(args);
     }
 
-
+    /**
+     * creates content value for this goal
+     * @param cursor in which goal and milestones are contained
+     */
     public void getGoal(Cursor cursor) {
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
@@ -421,6 +480,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
+    /**
+     * create new goal ContentValues for new goals
+     * @return new goal ContentValues values
+     */
     public ContentValues newGoal() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(GoalContract.GoalEntry.COLUMN_ID, "");
@@ -438,6 +501,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return contentValues;
     }
 
+    /**
+     * updates goals tasks: total, done, missed and remaining to reflect the sum of its
+     * milestones corresponding values.
+     * @param CVAL list of milestone ContentValues
+     */
     public void setGoalTasks(ArrayList<ContentValues> CVAL) {
         int total = 0;
         int done = 0;
@@ -455,11 +523,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         GoalValue.put(GoalContract.GoalEntry.COLUMN_TASKS_REMAINING, remaining);
     }
 
+    /**
+     * open account picker for google calendar function
+     */
     private void chooseAccount() {
         startActivityForResult(
                 mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
     }
 
+    /**
+     * Saves account after it is selected
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(
             int requestCode, int resultCode, Intent data) {
@@ -485,6 +562,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * add events to google calendar
+     * @param CVAL list of events to be added
+     */
     public void addEvents(ArrayList<ContentValues> CVAL) {
         String baseId = "goalgetterevent";
         ArrayList<Event> events = new ArrayList<>();
@@ -513,6 +594,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
 
+    /**
+     * start loader for recycler view content
+     * @param i identifer always 0
+     * @param bundle
+     * @return cursor loader to load all items with id as title from database
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
@@ -529,6 +616,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 sortOrder);
     }
 
+    /**
+     * Apply data to adapters
+     * @param loader
+     * @param data cursor to be applied
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         getGoal(data);
@@ -541,20 +633,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
+    /**
+     * clean up on scroll listeners
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (null != mMilestoneList) {
             mMilestoneList.clearOnScrollListeners();
+            mMilestoneGraph.clearOnScrollListeners();
         }
     }
 
+    //required method override
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //mGoalAdapter.swapCursor(null);
     }
 
-
+    /**
+     * Dialog fragment that displays a calendar and allows user to pick due dates for goals and milestones
+     */
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
@@ -565,11 +664,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
 
-
+        //sets view so that date can be displayed
         public void setView(View v){
             dateView = (EditText) v;
         }
 
+        //set calendar date to current due date or todays date
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
@@ -589,6 +689,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
+        //format and set selected date to edit text view
         public void onDateSet(DatePicker view, int year, int month, int day) {
             if (dateView != null) {
                 Calendar c = Calendar.getInstance();
@@ -600,6 +701,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
+    /**
+     * Async task to update goolge calendar
+     */
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.calendar.Calendar mService = null;
         private ArrayList<Event> mEvents = null;
@@ -611,7 +715,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         private String mCalendarId = "";
         private boolean delete;
 
-
+        //constructor used for creating a new calendar
         public MakeRequestTask(GoogleAccountCredential credential, ArrayList<Event> events, ArrayList<ContentValues> CVAL) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
@@ -626,6 +730,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     .build();
             delete=false;
         }
+
+        //constructor used to delete calendar
         public MakeRequestTask(GoogleAccountCredential credential){
             oldId=Utility.makeValidId(titleString);
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -637,6 +743,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             delete=true;
         }
 
+
+        //constructor used when updating an old calendar
         public MakeRequestTask(GoogleAccountCredential credential, ArrayList<ContentValues> CVAL){
             oldId=Utility.makeValidId(titleString);
             mCVAL = CVAL;
