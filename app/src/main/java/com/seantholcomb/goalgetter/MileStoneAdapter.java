@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
+ * Adapter to populate milestoneList in GoalDetailFragment
  * Created by seanholcomb on 10/14/15.
  */
 public class MilestoneAdapter extends RecyclerView.Adapter<MilestoneAdapter.MilestoneAdapterViewHolder> {

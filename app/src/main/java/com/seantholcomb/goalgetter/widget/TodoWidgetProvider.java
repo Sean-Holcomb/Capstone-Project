@@ -15,6 +15,7 @@ import com.seantholcomb.goalgetter.DashBoardActivity;
 import com.seantholcomb.goalgetter.R;
 
 /**
+ * Updates widgets attached to this app
  * Created by seanholcomb on 10/24/15.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)

@@ -17,13 +17,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
+ * Create Views for the to-do widget
  * Created by seanholcomb on 10/24/15.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class TodoWidgetRemoteViewsService extends RemoteViewsService {
         private static final String sortOrder = GoalContract.GoalEntry.COLUMN_DUE_DATE + " ASC";
 
-    //todo fix widget adaptor
+
     private static final String[] Goal_COLUMNS = {
 
             GoalContract.GoalEntry.TABLE_NAME + "." + GoalContract.GoalEntry._ID,

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.seantholcomb.goalgetter.data.GoalContract.GoalEntry;
 
 /**
+ * Creates SQL table
  * Created by seanholcomb on 10/8/15.
  */
 public class GoalDbHelper extends SQLiteOpenHelper{

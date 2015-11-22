@@ -10,6 +10,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
+ * Custom content provider for this application
+ * database queries are made through here
  * Created by seanholcomb on 10/8/15.
  */
 public class GoalProvider extends ContentProvider {
@@ -34,7 +36,7 @@ public class GoalProvider extends ContentProvider {
     }
 
 
-
+    //Different selections arguments used across the app
     private static final String sGoalSelection =
             GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
@@ -61,6 +63,7 @@ public class GoalProvider extends ContentProvider {
                     GoalContract.GoalEntry.TABLE_NAME +
                     "." + GoalContract.GoalEntry.COLUMN_TYPE + " = ? ";
 
+    //returns entire database
     private Cursor getGoal(Uri uri, String[] projection, String sortOrder) {
         return sGoalQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -72,6 +75,7 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
+    //returns goals and milestones with a given id
     private Cursor getGoalAndMilestones(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
@@ -86,6 +90,7 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
+    //returns goals that are marked as complete
     private Cursor getPastGoals(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
@@ -100,6 +105,7 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
+    //returns current goals
     private Cursor getCurrentGoal(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
@@ -113,6 +119,7 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
+    //returns current goals and milestones
     private Cursor getTodo(
             Uri uri, String[] projection, String[] selectionArgs, String sortOrder) {
 
@@ -127,7 +134,10 @@ public class GoalProvider extends ContentProvider {
         );
     }
 
-
+    /**
+     * Build uri matcher to sort requests
+     * @return said urimatcher
+     */
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = GoalContract.CONTENT_AUTHORITY;
@@ -141,13 +151,18 @@ public class GoalProvider extends ContentProvider {
         return matcher;
     }
 
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new GoalDbHelper(getContext());
         return true;
     }
 
-
+    /**
+     * match the uri to content type, all are the same
+     * @param uri
+     * @return
+     */
     @Override
     public String getType(Uri uri) {
 
@@ -171,6 +186,15 @@ public class GoalProvider extends ContentProvider {
         }
     }
 
+    /**
+     * matches uri and runs proper query method
+     * @param uri
+     * @param projection
+     * @param selection
+     * @param selectionArgs
+     * @param sortOrder
+     * @return cursor with appropriate data
+     */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
