@@ -3,10 +3,10 @@ Final project for Udacity Android Developer Nanodegree.
 Goal Getter is an app for keeping track of goals.
 
 ##Features
-*To-do list widget
-*Daily Notifications
-*Custom content provider
-*Option to add events to your Google Calendar through Google Calendar API
+* To-do list widget
+* Daily Notifications
+* Custom content provider
+* Option to add events to your Google Calendar through Google Calendar API
 
 ## User Guide
 Goal Getter saves you goals and allows you to set milestones to achieve them.
